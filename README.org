@@ -1,0 +1,10 @@
+#+TITLE: Emacs Config README
+#+AUTHOR: A2Zkiller
+#+DESCRIPTION: My personal emacs config
+#+STARTUP: showeverything
+#+OPTIONS: toc:2
+
+My personal emacs config. Used by my nixos config.
+
+Built using DistroTube's Configuring Emacs Series.
+
