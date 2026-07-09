@@ -71,18 +71,70 @@
 
   ;; Setup SPC as global leader key
   (general-create-definer a2z/leader-key
-			  :states '(normal insert visual emacs)
-			  :keymaps 'override
-			  :prefix "SPC"
-			  :global-prefix "M-SPC")
+    :states '(normal insert visual emacs)
+    :keymaps 'override
+    :prefix "SPC"
+    :global-prefix "M-SPC")
 
   (a2z/leader-key
-   "b" '(:ignore t :wk "Buffer")
-   "bb" '(switch-to-buffer :wk "Switch buffer")
-   "bk" '(kill-this-buffer :wk "Kill this buffer")
-   "bn" '(next-buffer :wk "Next buffer")
-   "bp" '(previous-buffer :wk "Previous buffer")
-   "br" '(revert-buffer :wk "Reload buffer")))
+    "." '(find-file :wk "Find file")
+    "f r" '(counsel-recentf :wk "Find recent files")
+    "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
+    "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
+    "c l" '(comment-line :wk "Comment line"))
+
+  (a2z/leader-key
+    "b" '(:ignore t :wk "Buffer")
+    "b b" '(switch-to-buffer :wk "Switch buffer")
+    "b k" '(kill-current-buffer :wk "Kill this buffer")
+    "b n" '(next-buffer :wk "Next buffer")
+    "b p" '(previous-buffer :wk "Previous buffer")
+    "b r" '(revert-buffer :wk "Reload buffer"))
+
+  (a2z/leader-key
+    "e" '(:ignore t :wk "Evaluate")
+    "e b" '(eval-buffer :wk "Evaluate Buffer")
+    "e d" '(eval-defun :wk "Evaluate Defun")
+    "e e" '(eval-expression :wk "Evaluate Expression")
+    "e r" '(eval-region :wk "Evaluate Region"))
+
+  (a2z/leader-key
+    "h" '(:ignore t :wk "Help")
+    "h f" '(describe-function :wk "Describe Function")
+    "h v" '(describe-variable :wk "Describe Variable"))
+
+  (a2z/leader-key
+    "t" '(:ignore t :wk "Toggle")
+    "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+    "t t" '(visual-line-mode :wk "Toggle visual line mode"))
+  
+  (a2z/leader-key
+    "w" '(:ignore t :wk "Windows")
+    ;; Window splits
+    "w c" '(evil-window-delete :wk "Close window")
+    "w n" '(evil-window-new :wk "New window")
+    "w s" '(evil-window-split :wk "Horizontal split window")
+    "w v" '(evil-window-vsplit :wk "Vertical split window")
+    ;; Window motions
+    "w h" '(evil-window-left :wk "Window left")
+    "w j" '(evil-window-down :wk "Window down")
+    "w k" '(evil-window-up :wk "Window up")
+    "w l" '(evil-window-right :wk "Window right")
+    "w w" '(evil-window-next :wk "Goto next window")
+    ;; Move Windows
+    "w H" '(buf-move-left :wk "Buffer move left")
+    "w J" '(buf-move-down :wk "Buffer move down")
+    "w K" '(buf-move-up :wk "Buffer move up")
+    "w L" '(buf-move-right :wk "Buffer move right"))
+)
+
+(use-package all-the-icons
+  :if (display-graphic-p))
+
+(use-package all-the-icons-dired
+  :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
+
+(use-package buffer-move)
 
 (set-face-attribute 'default nil
   :font "JetBrainsMono Nerd Font"
@@ -113,6 +165,37 @@
 
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
+(setq display-line-numbers-type 'relative)
+
+(use-package counsel
+  :after ivy
+  :config
+  (counsel-mode))
+
+(use-package ivy
+  :bind
+  (("C-c C-r" . ivy-resume)
+   ("C-x B" . ivy-switch-buffer-other-window))
+  :custom
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq enable-recursive-minibuffers t)
+  :config
+  (ivy-mode))
+
+(use-package all-the-icons-ivy-rich
+  :init
+  (all-the-icons-ivy-rich-mode 1))
+
+(use-package ivy-rich
+  :after ivy
+  :init (ivy-rich-mode 1)
+  :custom
+  (ivy-virtual-abbreviate 'full
+   ivy-rich-switch-buffer-align-virtual-buffer t
+   ivy-rich-path-style 'abbrev)
+  :config
+  (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
 (use-package toc-org
   :commands toc-org-enable
@@ -124,6 +207,16 @@
 (use-package org-bullets
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
+
+(electric-indent-mode -1)
+
+(require 'org-tempo)
+
+(use-package sudo-edit
+  :config
+  (a2z/leader-key
+    "fu" '(sudo-edit :wk "Sudo edit file")
+    "fU" '(sudo-edit-find-file :wk "Sudo edit file")))
 
 (which-key-mode 1)
 
