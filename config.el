@@ -43,6 +43,8 @@
   ;; Adds :ensure t to all use-package configs by default
   (setq use-package-always-ensure t))
 
+(setq frame-inhibit-implied-resize t)
+
 (use-package catppuccin-theme
   :config
   (load-theme 'catppuccin :no-confirm))
@@ -106,7 +108,8 @@
   (a2z/leader-key
     "t" '(:ignore t :wk "Toggle")
     "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-    "t t" '(visual-line-mode :wk "Toggle visual line mode"))
+    "t t" '(visual-line-mode :wk "Toggle visual line mode")
+    "t v" '(vterm-toggle :wk "Toggle vterm"))
   
   (a2z/leader-key
     "w" '(:ignore t :wk "Windows")
@@ -212,11 +215,34 @@
 
 (require 'org-tempo)
 
+(use-package rainbow-mode
+  :hook org-mode prog-mode)
+
 (use-package sudo-edit
   :config
   (a2z/leader-key
     "fu" '(sudo-edit :wk "Sudo edit file")
     "fU" '(sudo-edit-find-file :wk "Sudo edit file")))
+
+(use-package vterm)
+
+(use-package vterm-toggle
+  :after vterm
+  :config
+  (setq vterm-toggle-fullscreen-p nil)
+  (add-to-list 'display-buffer-alist
+           '((lambda (buffer-or-name _)
+                 (let ((buffer (get-buffer buffer-or-name)))
+                   (with-current-buffer buffer
+                     (or (equal major-mode 'vterm-mode)
+                         (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+              (display-buffer-reuse-window display-buffer-at-bottom)
+              ;;(display-buffer-reuse-window display-buffer-in-direction)
+              ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+              ;;(direction . bottom)
+              ;;(dedicated . t) ;dedicated is supported in emacs27
+              (reusable-frames . visible)
+              (window-height . 0.3))))
 
 (which-key-mode 1)
 
