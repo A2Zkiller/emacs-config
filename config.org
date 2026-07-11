@@ -10,7 +10,7 @@
   - [[#disable-resize-on-startup][Disable Resize on Startup]]
   - [[#load-theme][Load Theme]]
   - [[#load-evil-mode][Load Evil Mode]]
-  - [[#generalel-keybinds][General.el Keybinds]]
+  - [[#general-keybinds][General Keybinds]]
 - [[#all-the-icons][ALL THE ICONS]]
 - [[#buffer-move][BUFFER MOVE]]
 - [[#dashboard][DASHBOARD]]
@@ -122,7 +122,7 @@
     (use-package evil-tutor)
 #+end_src
 
-** General.el Keybinds
+** General Keybinds
 
 #+begin_src emacs-lisp
   (use-package general
@@ -344,11 +344,8 @@
 #+end_src
 
 
-* LANGUAGE SUPPORT
+* TODO LANGUAGE SUPPORT
 
-#+begin_src emacs-lisp
-  
-#+end_src
 
 * ORG MODE
 
