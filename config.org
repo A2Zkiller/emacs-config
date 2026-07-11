@@ -13,17 +13,21 @@
   - [[#generalel-keybinds][General.el Keybinds]]
 - [[#all-the-icons][ALL THE ICONS]]
 - [[#buffer-move][BUFFER MOVE]]
+- [[#dashboard][DASHBOARD]]
+- [[#diminish][DIMINISH]]
 - [[#fonts][FONTS]]
   - [[#set-font][Set Font]]
 - [[#gui-tweaks][GUI TWEAKS]]
   - [[#disable-menu-bar-toolbar-scrollbar][Disable Menu Bar, Toolbar, Scrollbar]]
   - [[#display-line-numbers][Display Line Numbers]]
 - [[#ivy--counsel][IVY + COUNSEL]]
+- [[#language-support][LANGUAGE SUPPORT]]
 - [[#org-mode][ORG MODE]]
   - [[#enable-table-of-contents][Enable Table of Contents]]
   - [[#enable-org-bullets][Enable Org Bullets]]
   - [[#disable-electric-indent-mode][Disable Electric Indent Mode]]
   - [[#enable-org-tempo][Enable Org Tempo]]
+- [[#projectile][PROJECTILE]]
 - [[#rainbow-mode][RAINBOW MODE]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#terminal][TERMINAL]]
@@ -121,69 +125,87 @@
 ** General.el Keybinds
 
 #+begin_src emacs-lisp
-    (use-package general
-      :config
-      (general-evil-setup)
+  (use-package general
+    :config
+    (general-evil-setup)
 
-      ;; Setup SPC as global leader key
-      (general-create-definer a2z/leader-key
-        :states '(normal insert visual emacs)
-        :keymaps 'override
-        :prefix "SPC"
-        :global-prefix "M-SPC")
+    ;; Setup SPC as global leader key
+    (general-create-definer a2z/leader-key
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :global-prefix "M-SPC")
 
-      (a2z/leader-key
-        "." '(find-file :wk "Find file")
-        "f r" '(counsel-recentf :wk "Find recent files")
-        "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
-        "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
-        "c l" '(comment-line :wk "Comment line"))
+    (a2z/leader-key
+      "SPC" '(counsel-M-x :wk "Counsel M-x")
+      "." '(find-file :wk "Find file")
+      "f r" '(counsel-recentf :wk "Find recent files")
+      "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
+      "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
+      "c l" '(comment-line :wk "Comment line"))
 
-      (a2z/leader-key
-        "b" '(:ignore t :wk "Buffer")
-        "b b" '(switch-to-buffer :wk "Switch buffer")
-        "b k" '(kill-current-buffer :wk "Kill this buffer")
-        "b n" '(next-buffer :wk "Next buffer")
-        "b p" '(previous-buffer :wk "Previous buffer")
-        "b r" '(revert-buffer :wk "Reload buffer"))
+    (a2z/leader-key
+      "b" '(:ignore t :wk "Buffer")
+      "b b" '(switch-to-buffer :wk "Switch buffer")
+      "b k" '(kill-current-buffer :wk "Kill this buffer")
+      "b n" '(next-buffer :wk "Next buffer")
+      "b p" '(previous-buffer :wk "Previous buffer")
+      "b r" '(revert-buffer :wk "Reload buffer"))
 
-      (a2z/leader-key
-        "e" '(:ignore t :wk "Evaluate")
-        "e b" '(eval-buffer :wk "Evaluate Buffer")
-        "e d" '(eval-defun :wk "Evaluate Defun")
-        "e e" '(eval-expression :wk "Evaluate Expression")
-        "e r" '(eval-region :wk "Evaluate Region"))
+    (a2z/leader-key
+      "e" '(:ignore t :wk "Evaluate")
+      "e b" '(eval-buffer :wk "Evaluate Buffer")
+      "e d" '(eval-defun :wk "Evaluate Defun")
+      "e e" '(eval-expression :wk "Evaluate Expression")
+      "e r" '(eval-region :wk "Evaluate Region"))
 
-      (a2z/leader-key
-        "h" '(:ignore t :wk "Help")
-        "h f" '(describe-function :wk "Describe Function")
-        "h v" '(describe-variable :wk "Describe Variable"))
+    (a2z/leader-key
+      "h" '(:ignore t :wk "Help")
+      "h f" '(describe-function :wk "Describe Function")
+      "h v" '(describe-variable :wk "Describe Variable"))
 
-      (a2z/leader-key
-        "t" '(:ignore t :wk "Toggle")
-        "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-        "t t" '(visual-line-mode :wk "Toggle visual line mode")
-        "t v" '(vterm-toggle :wk "Toggle vterm"))
-      
-      (a2z/leader-key
-        "w" '(:ignore t :wk "Windows")
-        ;; Window splits
-        "w c" '(evil-window-delete :wk "Close window")
-        "w n" '(evil-window-new :wk "New window")
-        "w s" '(evil-window-split :wk "Horizontal split window")
-        "w v" '(evil-window-vsplit :wk "Vertical split window")
-        ;; Window motions
-        "w h" '(evil-window-left :wk "Window left")
-        "w j" '(evil-window-down :wk "Window down")
-        "w k" '(evil-window-up :wk "Window up")
-        "w l" '(evil-window-right :wk "Window right")
-        "w w" '(evil-window-next :wk "Goto next window")
-        ;; Move Windows
-        "w H" '(buf-move-left :wk "Buffer move left")
-        "w J" '(buf-move-down :wk "Buffer move down")
-        "w K" '(buf-move-up :wk "Buffer move up")
-        "w L" '(buf-move-right :wk "Buffer move right"))
-    )
+    (a2z/leader-key
+      "m" '(:ignore t :wk "Org")
+      "m a" '(org-agenda :wk "Org agenda")
+      "m e" '(org-export-dispatch :wk "Org export dispatch")
+      "m i" '(org-toggle-item :wk "Org toggle item")
+      "m t" '(org-todo :wk "Org todo")
+      "m B" '(org-babel-tangle :wk "Org babel tangle")
+      "m T" '(org-todo-list :wk "Org todo list"))
+    
+    (a2z/leader-key
+      "m b" '(:ignore t :wk "Tables")
+      "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
+    
+    (a2z/leader-key
+      "m d" '(:ignore t :wk "Date/deadline")
+      "m d t" '(org-time-stamp :wk "Org time stamp"))
+
+    (a2z/leader-key
+      "t" '(:ignore t :wk "Toggle")
+      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+      "t t" '(visual-line-mode :wk "Toggle visual line mode")
+      "t v" '(vterm-toggle :wk "Toggle vterm"))
+    
+    (a2z/leader-key
+      "w" '(:ignore t :wk "Windows")
+      ;; Window splits
+      "w c" '(evil-window-delete :wk "Close window")
+      "w n" '(evil-window-new :wk "New window")
+      "w s" '(evil-window-split :wk "Horizontal split window")
+      "w v" '(evil-window-vsplit :wk "Vertical split window")
+      ;; Window motions
+      "w h" '(evil-window-left :wk "Window left")
+      "w j" '(evil-window-down :wk "Window down")
+      "w k" '(evil-window-up :wk "Window up")
+      "w l" '(evil-window-right :wk "Window right")
+      "w w" '(evil-window-next :wk "Goto next window")
+      ;; Move Windows
+      "w H" '(buf-move-left :wk "Buffer move left")
+      "w J" '(buf-move-down :wk "Buffer move down")
+      "w K" '(buf-move-up :wk "Buffer move up")
+      "w L" '(buf-move-right :wk "Buffer move right"))
+  )
 #+end_src
 
 
@@ -202,6 +224,39 @@
 
 #+begin_src emacs-lisp
   (use-package buffer-move)
+#+end_src
+
+
+* DASHBOARD
+
+#+begin_src emacs-lisp
+  (use-package dashboard
+    :ensure t 
+    :init
+    (setq initial-buffer-choice 'dashboard-open)
+    (setq dashboard-set-heading-icons t)
+    (setq dashboard-set-file-icons t)
+    (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
+    ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+    (setq dashboard-startup-banner (expand-file-name "./images/emacs-dash.png" user-emacs-directory))  ;; use custom image as banner
+    (setq dashboard-center-content t) ;; set to 't' for centered content
+    (setq dashboard-items '((recents . 5)
+                            (agenda . 5 )
+                            (bookmarks . 3)
+                            (projects . 3)
+                            (registers . 3)))
+    :custom
+    (dashboard-modify-heading-icons '((recents . "file-text")
+                                      (bookmarks . "book")))
+    :config
+    (dashboard-setup-startup-hook))
+#+end_src
+
+
+* DIMINISH
+
+#+begin_src emacs-lisp
+  (use-package diminish)
 #+end_src
 
 
@@ -289,6 +344,12 @@
 #+end_src
 
 
+* LANGUAGE SUPPORT
+
+#+begin_src emacs-lisp
+  
+#+end_src
+
 * ORG MODE
 
 ** Enable Table of Contents
@@ -320,6 +381,15 @@
 
 #+begin_src emacs-lisp
   (require 'org-tempo)
+#+end_src
+
+
+* PROJECTILE
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :config
+    (projectile-mode 1))
 #+end_src
 
 

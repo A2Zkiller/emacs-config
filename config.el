@@ -79,6 +79,7 @@
     :global-prefix "M-SPC")
 
   (a2z/leader-key
+    "SPC" '(counsel-M-x :wk "Counsel M-x")
     "." '(find-file :wk "Find file")
     "f r" '(counsel-recentf :wk "Find recent files")
     "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
@@ -104,6 +105,23 @@
     "h" '(:ignore t :wk "Help")
     "h f" '(describe-function :wk "Describe Function")
     "h v" '(describe-variable :wk "Describe Variable"))
+
+  (a2z/leader-key
+    "m" '(:ignore t :wk "Org")
+    "m a" '(org-agenda :wk "Org agenda")
+    "m e" '(org-export-dispatch :wk "Org export dispatch")
+    "m i" '(org-toggle-item :wk "Org toggle item")
+    "m t" '(org-todo :wk "Org todo")
+    "m B" '(org-babel-tangle :wk "Org babel tangle")
+    "m T" '(org-todo-list :wk "Org todo list"))
+  
+  (a2z/leader-key
+    "m b" '(:ignore t :wk "Tables")
+    "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
+  
+  (a2z/leader-key
+    "m d" '(:ignore t :wk "Date/deadline")
+    "m d t" '(org-time-stamp :wk "Org time stamp"))
 
   (a2z/leader-key
     "t" '(:ignore t :wk "Toggle")
@@ -138,6 +156,29 @@
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
 (use-package buffer-move)
+
+(use-package dashboard
+  :ensure t 
+  :init
+  (setq initial-buffer-choice 'dashboard-open)
+  (setq dashboard-set-heading-icons t)
+  (setq dashboard-set-file-icons t)
+  (setq dashboard-banner-logo-title "Emacs Is More Than A Text Editor!")
+  ;;(setq dashboard-startup-banner 'logo) ;; use standard emacs logo as banner
+  (setq dashboard-startup-banner (expand-file-name "./images/emacs-dash.png" user-emacs-directory))  ;; use custom image as banner
+  (setq dashboard-center-content t) ;; set to 't' for centered content
+  (setq dashboard-items '((recents . 5)
+                          (agenda . 5 )
+                          (bookmarks . 3)
+                          (projects . 3)
+                          (registers . 3)))
+  :custom
+  (dashboard-modify-heading-icons '((recents . "file-text")
+                                    (bookmarks . "book")))
+  :config
+  (dashboard-setup-startup-hook))
+
+(use-package diminish)
 
 (set-face-attribute 'default nil
   :font "JetBrainsMono Nerd Font"
@@ -200,6 +241,8 @@
   :config
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
 
+
+
 (use-package toc-org
   :commands toc-org-enable
   :init
@@ -214,6 +257,10 @@
 (electric-indent-mode -1)
 
 (require 'org-tempo)
+
+(use-package projectile
+  :config
+  (projectile-mode 1))
 
 (use-package rainbow-mode
   :hook org-mode prog-mode)
