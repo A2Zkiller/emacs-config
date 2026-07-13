@@ -4,35 +4,49 @@
 #+STARTUP: showeverything
 #+OPTIONS: toc:2
 
-* TABLE OF CONTENTS :toc:
+* TABLE OF CONTENTS                                                   :TOC_2:
 - [[#load-first][LOAD FIRST]]
   - [[#elpaca][Elpaca]]
   - [[#disable-resize-on-startup][Disable Resize on Startup]]
   - [[#load-theme][Load Theme]]
-  - [[#load-evil-mode][Load Evil Mode]]
-  - [[#general-keybinds][General Keybinds]]
 - [[#all-the-icons][ALL THE ICONS]]
 - [[#buffer-move][BUFFER MOVE]]
+- [[#cleanup][CLEANUP]]
+- [[#company][COMPANY]]
 - [[#dashboard][DASHBOARD]]
 - [[#diminish][DIMINISH]]
+- [[#dired][DIRED]]
+- [[#direnv][DIRENV]]
+- [[#disable-bell][DISABLE BELL]]
+- [[#evil][EVIL]]
 - [[#fonts][FONTS]]
   - [[#set-font][Set Font]]
+- [[#general-keybinds][GENERAL KEYBINDS]]
 - [[#gui-tweaks][GUI TWEAKS]]
   - [[#disable-menu-bar-toolbar-scrollbar][Disable Menu Bar, Toolbar, Scrollbar]]
   - [[#display-line-numbers][Display Line Numbers]]
 - [[#ivy--counsel][IVY + COUNSEL]]
 - [[#language-support][LANGUAGE SUPPORT]]
+  - [[#rust][Rust]]
+  - [[#nix][Nix]]
+- [[#modeline][MODELINE]]
+- [[#neotree][NEOTREE]]
 - [[#org-mode][ORG MODE]]
   - [[#enable-table-of-contents][Enable Table of Contents]]
   - [[#enable-org-bullets][Enable Org Bullets]]
   - [[#disable-electric-indent-mode][Disable Electric Indent Mode]]
   - [[#enable-org-tempo][Enable Org Tempo]]
 - [[#projectile][PROJECTILE]]
+- [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#rainbow-mode][RAINBOW MODE]]
+- [[#sane-defaults][SANE DEFAULTS]]
 - [[#sudo-edit][SUDO EDIT]]
 - [[#terminal][TERMINAL]]
   - [[#vterm][Vterm]]
   - [[#vterm-toggle][Vterm Toggle]]
+- [[#vcs][VCS]]
+  - [[#magit][Magit]]
+  - [[#majutsu][Majutsu]]
 - [[#which-key][WHICH KEY]]
 
 * LOAD FIRST
@@ -100,115 +114,6 @@
     (load-theme 'catppuccin :no-confirm))
 #+end_src
 
-** Load Evil Mode
-
-#+begin_src emacs-lisp
-    (use-package evil
-      :init
-      (setq evil-want-keybinding nil)
-      (setq evil-vsplit-window-right t)
-      (setq evil-split-window-below t)
-
-      :config
-      (evil-mode 1)
-      (evil-set-undo-system 'undo-redo))
-
-    (use-package evil-collection
-      :after evil
-      :config
-      (setq evil-collection-mode-list '(dashboard dired ibuffer))
-      (evil-collection-init))
-
-    (use-package evil-tutor)
-#+end_src
-
-** General Keybinds
-
-#+begin_src emacs-lisp
-  (use-package general
-    :config
-    (general-evil-setup)
-
-    ;; Setup SPC as global leader key
-    (general-create-definer a2z/leader-key
-      :states '(normal insert visual emacs)
-      :keymaps 'override
-      :prefix "SPC"
-      :global-prefix "M-SPC")
-
-    (a2z/leader-key
-      "SPC" '(counsel-M-x :wk "Counsel M-x")
-      "." '(find-file :wk "Find file")
-      "f r" '(counsel-recentf :wk "Find recent files")
-      "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
-      "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
-      "c l" '(comment-line :wk "Comment line"))
-
-    (a2z/leader-key
-      "b" '(:ignore t :wk "Buffer")
-      "b b" '(switch-to-buffer :wk "Switch buffer")
-      "b k" '(kill-current-buffer :wk "Kill this buffer")
-      "b n" '(next-buffer :wk "Next buffer")
-      "b p" '(previous-buffer :wk "Previous buffer")
-      "b r" '(revert-buffer :wk "Reload buffer"))
-
-    (a2z/leader-key
-      "e" '(:ignore t :wk "Evaluate")
-      "e b" '(eval-buffer :wk "Evaluate Buffer")
-      "e d" '(eval-defun :wk "Evaluate Defun")
-      "e e" '(eval-expression :wk "Evaluate Expression")
-      "e r" '(eval-region :wk "Evaluate Region"))
-
-    (a2z/leader-key
-      "h" '(:ignore t :wk "Help")
-      "h f" '(describe-function :wk "Describe Function")
-      "h v" '(describe-variable :wk "Describe Variable"))
-
-    (a2z/leader-key
-      "m" '(:ignore t :wk "Org")
-      "m a" '(org-agenda :wk "Org agenda")
-      "m e" '(org-export-dispatch :wk "Org export dispatch")
-      "m i" '(org-toggle-item :wk "Org toggle item")
-      "m t" '(org-todo :wk "Org todo")
-      "m B" '(org-babel-tangle :wk "Org babel tangle")
-      "m T" '(org-todo-list :wk "Org todo list"))
-    
-    (a2z/leader-key
-      "m b" '(:ignore t :wk "Tables")
-      "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
-    
-    (a2z/leader-key
-      "m d" '(:ignore t :wk "Date/deadline")
-      "m d t" '(org-time-stamp :wk "Org time stamp"))
-
-    (a2z/leader-key
-      "t" '(:ignore t :wk "Toggle")
-      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-      "t t" '(visual-line-mode :wk "Toggle visual line mode")
-      "t v" '(vterm-toggle :wk "Toggle vterm"))
-    
-    (a2z/leader-key
-      "w" '(:ignore t :wk "Windows")
-      ;; Window splits
-      "w c" '(evil-window-delete :wk "Close window")
-      "w n" '(evil-window-new :wk "New window")
-      "w s" '(evil-window-split :wk "Horizontal split window")
-      "w v" '(evil-window-vsplit :wk "Vertical split window")
-      ;; Window motions
-      "w h" '(evil-window-left :wk "Window left")
-      "w j" '(evil-window-down :wk "Window down")
-      "w k" '(evil-window-up :wk "Window up")
-      "w l" '(evil-window-right :wk "Window right")
-      "w w" '(evil-window-next :wk "Goto next window")
-      ;; Move Windows
-      "w H" '(buf-move-left :wk "Buffer move left")
-      "w J" '(buf-move-down :wk "Buffer move down")
-      "w K" '(buf-move-up :wk "Buffer move up")
-      "w L" '(buf-move-right :wk "Buffer move right"))
-  )
-#+end_src
-
-
 * ALL THE ICONS
 
 #+begin_src emacs-lisp
@@ -224,6 +129,28 @@
 
 #+begin_src emacs-lisp
   (use-package buffer-move)
+#+end_src
+
+
+* CLEANUP
+
+#+begin_src emacs-lisp
+  ;; Move backups (filename.ext~) to separate directory
+  (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files/")))
+#+end_src
+
+
+* COMPANY
+
+#+begin_src emacs-lisp
+  (use-package company
+    :diminish
+    :hook (elpaca-after-init . global-company-mode))
+        
+  (use-package company-box
+    :after company
+    :diminish
+    :hook (company-mode . company-box-mode))
 #+end_src
 
 
@@ -260,6 +187,69 @@
 #+end_src
 
 
+* DIRED
+
+#+begin_src emacs-lisp
+    (use-package dired-open 
+      :config
+      (setq dired-open-extensions '(("gif" . "feh")
+    				("jpg" . "feh")
+    				("png" . "feh")
+    				("mp4" . "mpv")
+    				("mkv" . "mpv"))))
+
+    (use-package dired-preview
+      :after dired
+      :config 
+      (setq dired-preview-delay 0.1)
+      (dired-preview-global-mode 1))
+#+end_src
+
+
+* DIRENV
+
+#+begin_src emacs-lisp
+  (use-package envrc
+    :hook (elpaca-after-init . envrc-global-mode))
+#+end_src
+
+
+* DISABLE BELL
+
+#+begin_src emacs-lisp
+  (setq visible-bell 1)
+#+end_src
+
+
+* EVIL
+
+#+begin_src emacs-lisp
+  (use-package evil
+    :init
+    (setq evil-want-keybinding nil)
+    (setq evil-vsplit-window-right t)
+    (setq evil-split-window-below t)
+
+    :config
+    (evil-mode 1)
+    (evil-set-undo-system 'undo-redo))
+
+  (use-package evil-collection
+    :after evil
+    :config
+    ;;(setq evil-collection-mode-list '(dashboard dired ibuffer))
+    (evil-collection-init))
+
+  (use-package evil-tutor)
+  
+  (use-package evil-org
+    :after org evil
+    :hook (org-mode . (lambda () evil-org-mode))
+    :config
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
+#+end_src
+
 * FONTS
 
 ** Set Font
@@ -287,6 +277,138 @@
 
   ;; Emacs Client
   (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-14"))
+#+end_src
+
+
+* GENERAL KEYBINDS
+
+#+begin_src emacs-lisp
+  (use-package general
+    :config
+    (general-evil-setup)
+
+    ;; Setup SPC as global leader key
+    (general-create-definer a2z/leader-key
+      :states '(normal insert visual emacs)
+      :keymaps 'override
+      :prefix "SPC"
+      :global-prefix "M-SPC")
+
+    (a2z/leader-key
+      "SPC" '(counsel-M-x :wk "Counsel M-x")
+      "." '(find-file :wk "Find file")
+      "f r" '(counsel-recentf :wk "Find recent files")
+      "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
+      "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
+      "f d" '(dashboard-open :wk "Open dashboard")
+      "c l" '(comment-line :wk "Comment line"))
+
+    (a2z/leader-key
+      "b" '(:ignore t :wk "Bookmarks/Buffers")
+      "b b" '(switch-to-buffer :wk "Switch to buffer")
+      "b c" '(clone-indirect-buffer :wk "Create indirect buffer copy in a split")
+      "b C" '(clone-indirect-buffer-other-window :wk "Clone indirect buffer in new window")
+      "b d" '(bookmark-delete :wk "Delete bookmark")
+      "b i" '(ibuffer :wk "Ibuffer")
+      "b k" '(kill-current-buffer :wk "Kill current buffer")
+      "b K" '(kill-some-buffers :wk "Kill multiple buffers")
+      "b l" '(list-bookmarks :wk "List bookmarks")
+      "b m" '(bookmark-set :wk "Set bookmark")
+      "b n" '(next-buffer :wk "Next buffer")
+      "b p" '(previous-buffer :wk "Previous buffer")
+      "b r" '(revert-buffer :wk "Reload buffer")
+      "b R" '(rename-buffer :wk "Rename buffer")
+      "b s" '(basic-save-buffer :wk "Save buffer")
+      "b S" '(save-some-buffers :wk "Save multiple buffers")
+      "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+    
+    (a2z/leader-key
+      "d" '(:ignore t :wk "Dired")
+      "d d" '(dired :wk "Open Dired")
+      "d j" '(dired-jump :wk "Jump to current buffer dired")
+      "d n" '(neotree-dir :wk "Open directory in neotree")
+      "d p" '(dired-preview-mode :wk "Toggle dired preview"))
+
+    (a2z/leader-key
+      "e" '(:ignore t :wk "Evaluate")
+      "e b" '(eval-buffer :wk "Evaluate Buffer")
+      "e d" '(eval-defun :wk "Evaluate Defun")
+      "e e" '(eval-expression :wk "Evaluate Expression")
+      "e r" '(eval-region :wk "Evaluate Region"))
+
+    (a2z/leader-key
+      "h" '(:ignore t :wk "Help")
+      "h a" '(counsel-apropos :wk "Apropos")
+      "h b" '(describe-bindings :wk "Describe bindings")
+      "h c" '(describe-char :wk "Describe character under cursor")
+      "h d" '(:ignore t :wk "Emacs documentation")
+      "h d a" '(about-emacs :wk "About Emacs")
+      "h d d" '(view-emacs-debugging :wk "View Emacs debugging")
+      "h d f" '(view-emacs-FAQ :wk "View Emacs FAQ")
+      "h d m" '(info-emacs-manual :wk "The Emacs manual")
+      "h d n" '(view-emacs-news :wk "View Emacs news")
+      "h d o" '(describe-distribution :wk "How to obtain Emacs")
+      "h d p" '(view-emacs-problems :wk "View Emacs problems")
+      "h d t" '(view-emacs-todo :wk "View Emacs todo")
+      "h d w" '(describe-no-warranty :wk "Describe no warranty")
+      "h e" '(view-echo-area-messages :wk "View echo area messages")
+      "h f" '(describe-function :wk "Describe function")
+      "h F" '(describe-face :wk "Describe face")
+      "h g" '(describe-gnu-project :wk "Describe GNU Project")
+      "h i" '(info :wk "Info")
+      "h I" '(describe-input-method :wk "Describe input method")
+      "h k" '(describe-key :wk "Describe key")
+      "h l" '(view-lossage :wk "Display recent keystrokes and the commands run")
+      "h L" '(describe-language-environment :wk "Describe language environment")
+      "h m" '(describe-mode :wk "Describe mode")
+      "h t" '(load-theme :wk "Load theme")
+      "h v" '(describe-variable :wk "Describe variable")
+      "h w" '(where-is :wk "Prints keybinding for command if set")
+      "h x" '(describe-command :wk "Display full documentation for command"))
+
+    (a2z/leader-key
+      "m" '(:ignore t :wk "Org")
+      "m a" '(org-agenda :wk "Org agenda")
+      "m e" '(org-export-dispatch :wk "Org export dispatch")
+      "m i" '(org-toggle-item :wk "Org toggle item")
+      "m t" '(org-todo :wk "Org todo")
+      "m B" '(org-babel-tangle :wk "Org babel tangle")
+      "m T" '(org-todo-list :wk "Org todo list"))
+    
+    (a2z/leader-key
+      "m b" '(:ignore t :wk "Tables")
+      "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
+    
+    (a2z/leader-key
+      "m d" '(:ignore t :wk "Date/deadline")
+      "m d t" '(org-time-stamp :wk "Org time stamp"))
+
+    (a2z/leader-key
+      "t" '(:ignore t :wk "Toggle")
+      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+      "t t" '(visual-line-mode :wk "Toggle visual line mode")
+      "t v" '(vterm-toggle :wk "Toggle vterm")
+      "t n" '(neotree-toggle :wk "Toggle neotree"))
+    
+    (a2z/leader-key
+      "w" '(:ignore t :wk "Windows")
+      ;; Window splits
+      "w c" '(evil-window-delete :wk "Close window")
+      "w n" '(evil-window-new :wk "New window")
+      "w s" '(evil-window-split :wk "Horizontal split window")
+      "w v" '(evil-window-vsplit :wk "Vertical split window")
+      ;; Window motions
+      "w h" '(evil-window-left :wk "Window left")
+      "w j" '(evil-window-down :wk "Window down")
+      "w k" '(evil-window-up :wk "Window up")
+      "w l" '(evil-window-right :wk "Window right")
+      "w w" '(evil-window-next :wk "Goto next window")
+      ;; Move Windows
+      "w H" '(buf-move-left :wk "Buffer move left")
+      "w J" '(buf-move-down :wk "Buffer move down")
+      "w K" '(buf-move-up :wk "Buffer move up")
+      "w L" '(buf-move-right :wk "Buffer move right"))
+  )
 #+end_src
 
 
@@ -340,11 +462,53 @@
      ivy-rich-switch-buffer-align-virtual-buffer t
      ivy-rich-path-style 'abbrev)
     :config
-    (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-rich-switch-buffer-transformer))
+    (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-switch-buffer-transformer))
 #+end_src
 
 
-* TODO LANGUAGE SUPPORT
+* LANGUAGE SUPPORT
+
+** Rust
+
+#+begin_src emacs-lisp
+  (use-package rust-mode)
+  (add-hook 'rust-mode-hook #'eglot-ensure)
+#+end_src
+
+** Nix
+
+#+begin_src emacs-lisp
+  (use-package nix-mode
+    :mode "\\.nix\\'")
+#+end_src
+
+
+* MODELINE
+
+#+begin_src emacs-lisp
+  (use-package doom-modeline
+    :init (doom-modeline-mode 1)
+    :config
+    (setq doom-modeline-height 30
+  	doom-modeline-bar-width 5
+  	doom-modeline-persp-name t
+  	doom-modeline-persp-icon t))
+#+end_src
+
+
+* NEOTREE
+
+#+begin_src emacs-lisp
+  (use-package neotree
+    :config
+    (setq neo-smart-open t
+  	neo-show-hidden-files t
+  	neo-window-width 40
+  	neo-window-fixed-size nil
+  	inhibit-impacting-font-caches t
+  	projectile-switch-project-action 'neotree-projectile-action))
+    
+#+end_src
 
 
 * ORG MODE
@@ -390,6 +554,14 @@
 #+end_src
 
 
+* RAINBOW DELIMITERS
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :hook ((emacs-lisp-mode . rainbow-delimiters-mode)))
+#+end_src
+
+
 * RAINBOW MODE
 Display the color of hex codes behind them (ex. #ffffff, #000000)
 
@@ -397,6 +569,23 @@ Display the color of hex codes behind them (ex. #ffffff, #000000)
   (use-package rainbow-mode
     :hook org-mode prog-mode)
 #+end_src
+
+
+* SANE DEFAULTS
+
+#+begin_src emacs-lisp
+  (electric-pair-mode 1)
+
+  ;; Do not pair < with > when in org mode (for org-tempo)
+  (add-hook 'org-mode-hook (lambda ()
+           (setq-local electric-pair-inhibit-predicate
+                   `(lambda (c)
+                  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+
+  (global-auto-revert-mode 1)
+  (delete-selection-mode 1)
+#+end_src
+
 
 * SUDO EDIT
 
@@ -438,6 +627,28 @@ Display the color of hex codes behind them (ex. #ffffff, #000000)
                  (reusable-frames . visible)
                  (window-height . 0.3))))
 #+end_src
+
+
+* VCS
+
+** Magit
+
+#+begin_src emacs-lisp
+  ;; required dependency
+  (use-package transient :ensure t)
+
+  (use-package magit)
+#+end_src
+
+
+** Majutsu
+
+#+begin_src emacs-lisp
+  (use-package majutsu
+    :vc (:url "https://github.com/0WD0/majutsu")
+    :after magit)
+#+end_src
+
 
 * WHICH KEY
 
