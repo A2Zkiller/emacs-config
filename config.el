@@ -57,13 +57,17 @@
 
 (use-package buffer-move)
 
-;; Move backups (filename.ext~) to separate directory
+;; Move backups (filename~) to separate directory
 (setq backup-directory-alist '((".*" . "~/.local/share/Trash/files/")))
+;; Move autosaves (#filename#) to separate directory
+(make-directory (expand-file-name "autosaves/" user-emacs-directory) t)
+(setq auto-save-file-name-transforms
+      `((".*" ,(expand-file-name "autosaves/" user-emacs-directory) t)))
 
 (use-package company
   :diminish
   :hook (elpaca-after-init . global-company-mode))
-      
+
 (use-package company-box
   :after company
   :diminish
@@ -84,6 +88,7 @@
                           (bookmarks . 3)
                           (projects . 3)
                           (registers . 3)))
+  (setq dashboard-projects-backend 'projectile)
   :custom
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book")))
@@ -116,7 +121,7 @@
   (setq evil-want-keybinding nil)
   (setq evil-vsplit-window-right t)
   (setq evil-split-window-below t)
-
+  
   :config
   (evil-mode 1)
   (evil-set-undo-system 'undo-redo))
@@ -136,32 +141,25 @@
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
-;; (with-eval-after-load 'evil-maps
-;;   (define-key evil-motion-state-map (kbd "SPC") nil)
-;;   (define-key evil-motion-state-map (kbd "RET") nil)
-;;   (define-key evil-motion-state-map (kbd "TAB") nil))
-
-;; (setq org-return-follow-links t)
-
 (set-face-attribute 'default nil
-  :font "JetBrainsMono Nerd Font"
-  :height 140
-  :weight 'regular)
+		    :font "JetBrainsMono Nerd Font"
+		    :height 140
+		    :weight 'regular)
 (set-face-attribute 'variable-pitch nil
-  :font "Noto Sans"
-  :height 120
-  :weight 'regular)
+		    :font "Noto Sans"
+		    :height 120
+		    :weight 'regular)
 (set-face-attribute 'fixed-pitch nil
-  :font "JetBrainsMono Nerd Font"
-  :height 140
-  :weight 'regular)
+		    :font "JetBrainsMono Nerd Font"
+		    :height 140
+		    :weight 'regular)
 ;; Makes commented text and keywords italics.
 ;; This is working in emacsclient but not emacs.
 ;; Your font must have an italic face available.
 (set-face-attribute 'font-lock-comment-face nil
-  :slant 'italic)
+		    :slant 'italic)
 (set-face-attribute 'font-lock-keyword-face nil
-  :slant 'italic)
+		    :slant 'italic)
 
 ;; Emacs Client
 (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-14"))
@@ -218,6 +216,11 @@
     "e d" '(eval-defun :wk "Evaluate Defun")
     "e e" '(eval-expression :wk "Evaluate Expression")
     "e r" '(eval-region :wk "Evaluate Region"))
+
+  (a2z/leader-key
+    "g" '(:ignore t :wk "Git")
+    "g g" '(magit :wk "Launch Magit")
+    "g j" '(majutsu :wk "Launch Majutsu"))
 
   (a2z/leader-key
     "h" '(:ignore t :wk "Help")
@@ -291,7 +294,7 @@
     "w J" '(buf-move-down :wk "Buffer move down")
     "w K" '(buf-move-up :wk "Buffer move up")
     "w L" '(buf-move-right :wk "Buffer move right"))
-)
+  )
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
@@ -326,16 +329,26 @@
   :init (ivy-rich-mode 1)
   :custom
   (ivy-virtual-abbreviate 'full
-   ivy-rich-switch-buffer-align-virtual-buffer t
-   ivy-rich-path-style 'abbrev)
+			  ivy-rich-switch-buffer-align-virtual-buffer t
+			  ivy-rich-path-style 'abbrev)
   :config
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-switch-buffer-transformer))
 
-(use-package rust-mode)
-(add-hook 'rust-mode-hook #'eglot-ensure)
+(setq treesit-font-lock-level 4)
 
-(use-package nix-mode
+;;(use-package rust-mode)
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
+(add-hook 'rust-ts-mode-hook #'eglot-ensure)
+
+(use-package nix-ts-mode
   :mode "\\.nix\\'")
+
+(add-hook 'nix-ts-mode-hook #'eglot-ensure)
+
+;; Link up nixd and nil
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+		 '(nix-ts-mode . ("rass" "--" "nixd" "--" "nil"))))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
@@ -365,8 +378,6 @@
   :config
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
-(electric-indent-mode -1)
-
 (require 'org-tempo)
 
 (use-package projectile
@@ -383,12 +394,17 @@
 
 ;; Do not pair < with > when in org mode (for org-tempo)
 (add-hook 'org-mode-hook (lambda ()
-         (setq-local electric-pair-inhibit-predicate
-                 `(lambda (c)
-                (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
+			   (setq-local electric-pair-inhibit-predicate
+				       `(lambda (c)
+					  (if (char-equal c ?<) t (,electric-pair-inhibit-predicate c))))))
 
 (global-auto-revert-mode 1)
 (delete-selection-mode 1)
+(setq use-file-dialog nil)   ;; No file dialog
+(setq use-dialog-box nil)    ;; No dialog box
+(setq pop-up-windows nil)    ;; No popup windows
+
+(server-start)
 
 (use-package sudo-edit
   :config
@@ -403,18 +419,18 @@
   :config
   (setq vterm-toggle-fullscreen-p nil)
   (add-to-list 'display-buffer-alist
-           '((lambda (buffer-or-name _)
-                 (let ((buffer (get-buffer buffer-or-name)))
-                   (with-current-buffer buffer
-                     (or (equal major-mode 'vterm-mode)
-                         (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
-              (display-buffer-reuse-window display-buffer-at-bottom)
-              ;;(display-buffer-reuse-window display-buffer-in-direction)
-              ;;display-buffer-in-direction/direction/dedicated is added in emacs27
-              ;;(direction . bottom)
-              ;;(dedicated . t) ;dedicated is supported in emacs27
-              (reusable-frames . visible)
-              (window-height . 0.3))))
+               '((lambda (buffer-or-name _)
+                   (let ((buffer (get-buffer buffer-or-name)))
+                     (with-current-buffer buffer
+                       (or (equal major-mode 'vterm-mode)
+                           (string-prefix-p vterm-buffer-name (buffer-name buffer))))))
+		 (display-buffer-reuse-window display-buffer-at-bottom)
+		 ;;(display-buffer-reuse-window display-buffer-in-direction)
+		 ;;display-buffer-in-direction/direction/dedicated is added in emacs27
+		 ;;(direction . bottom)
+		 ;;(dedicated . t) ;dedicated is supported in emacs27
+		 (reusable-frames . visible)
+		 (window-height . 0.3))))
 
 ;; required dependency
 (use-package transient :ensure t)
@@ -428,14 +444,14 @@
 (which-key-mode 1)
 
 (setq which-key-side-window-location 'bottom
-	  which-key-sort-order #'which-key-key-order-alpha
-	  which-key-sort-uppercase-first nil
-	  which-key-add-column-padding 1
-	  which-key-max-display-columns nil
-	  which-key-min-display-lines 6
-	  which-key-side-window-slot -10
-	  which-key-side-window-max-height 0.25
-	  which-key-idle-delay 0.8
-	  which-key-max-description-length 25
-	  which-key-allow-imprecise-window-fit t
-	  which-key-separator " → " )
+      which-key-sort-order #'which-key-key-order-alpha
+      which-key-sort-uppercase-first nil
+      which-key-add-column-padding 1
+      which-key-max-display-columns nil
+      which-key-min-display-lines 6
+      which-key-side-window-slot -10
+      which-key-side-window-max-height 0.25
+      which-key-idle-delay 0.8
+      which-key-max-description-length 25
+      which-key-allow-imprecise-window-fit t
+      which-key-separator " → " )
