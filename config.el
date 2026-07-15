@@ -64,9 +64,14 @@
 (setq auto-save-file-name-transforms
       `((".*" ,(expand-file-name "autosaves/" user-emacs-directory) t)))
 
+(setq create-lockfiles nil)
+
 (use-package company
   :diminish
-  :hook (elpaca-after-init . global-company-mode))
+  :hook (elpaca-after-init . global-company-mode)
+  :config
+  (setq company-idle-delay 0.0 
+	company-minimum-prefix-length 1))
 
 (use-package company-box
   :after company
@@ -74,7 +79,7 @@
   :hook (company-mode . company-box-mode))
 
 (use-package dashboard
-  :ensure t 
+  :after projectile
   :init
   (setq initial-buffer-choice 'dashboard-open)
   (setq dashboard-set-heading-icons t)
@@ -84,16 +89,16 @@
   (setq dashboard-startup-banner (expand-file-name "./images/emacs-dash.png" user-emacs-directory))  ;; use custom image as banner
   (setq dashboard-center-content t) ;; set to 't' for centered content
   (setq dashboard-items '((recents . 5)
-                          (agenda . 5 )
+                          (agenda . 5)
                           (bookmarks . 3)
-                          (projects . 3)
-                          (registers . 3)))
+                          (projects . 5)))
   (setq dashboard-projects-backend 'projectile)
   :custom
   (dashboard-modify-heading-icons '((recents . "file-text")
                                     (bookmarks . "book")))
   :config
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (add-hook 'dashboard-mode-hook (lambda () (display-line-numbers-mode -1))))
 
 (use-package diminish)
 
@@ -115,6 +120,11 @@
   :hook (elpaca-after-init . envrc-global-mode))
 
 (setq visible-bell 1)
+
+(use-package eglot-booster
+  :vc (:url "https://github.com/jdtsmith/eglot-booster")
+  :after eglot
+  :config (eglot-booster-mode))
 
 (use-package evil
   :init
@@ -140,6 +150,11 @@
   :config
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
+
+(use-package evil-surround
+  :after evil
+  :config
+  (global-evil-surround-mode 1))
 
 (set-face-attribute 'default nil
 		    :font "JetBrainsMono Nerd Font"
@@ -181,8 +196,7 @@
     "f r" '(counsel-recentf :wk "Find recent files")
     "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
     "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
-    "f d" '(dashboard-open :wk "Open dashboard")
-    "c l" '(comment-line :wk "Comment line"))
+    "f d" '(dashboard-open :wk "Open dashboard"))
 
   (a2z/leader-key
     "b" '(:ignore t :wk "Bookmarks/Buffers")
@@ -202,13 +216,19 @@
     "b s" '(basic-save-buffer :wk "Save buffer")
     "b S" '(save-some-buffers :wk "Save multiple buffers")
     "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+
+  (a2z/leader-key
+    "c" '(:ignore t :wk "Code / Comments")
+    "c l" '(comment-line :wk "Comment line")
+	"c a" '(eglot-code-actions :wk "Code Actions"))
   
   (a2z/leader-key
     "d" '(:ignore t :wk "Dired")
     "d d" '(dired :wk "Open Dired")
     "d j" '(dired-jump :wk "Jump to current buffer dired")
     "d n" '(neotree-dir :wk "Open directory in neotree")
-    "d p" '(dired-preview-mode :wk "Toggle dired preview"))
+    "d p" '(dired-preview-mode :wk "Toggle dired preview")
+    "d P" '(project-dired :wk "Project Dired"))
 
   (a2z/leader-key
     "e" '(:ignore t :wk "Evaluate")
@@ -270,6 +290,12 @@
     "m d t" '(org-time-stamp :wk "Org time stamp"))
 
   (a2z/leader-key
+    "p" '(:ignore t :wk "Project")
+    "p k" '(project-kill-buffers :wk "Project kill buffers")
+    "p b" '(project-switch-to-buffer :wk "Project switch to buffer")
+    "p B" '(project-list-buffers :wk "Project list buffers"))
+
+  (a2z/leader-key
     "t" '(:ignore t :wk "Toggle")
     "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
     "t t" '(visual-line-mode :wk "Toggle visual line mode")
@@ -302,6 +328,7 @@
 
 (global-display-line-numbers-mode 1)
 (global-visual-line-mode t)
+(column-number-mode t)
 (setq display-line-numbers-type 'relative)
 
 (use-package counsel
@@ -336,9 +363,21 @@
 
 (setq treesit-font-lock-level 4)
 
-;;(use-package rust-mode)
-(add-to-list 'auto-mode-alist '("\\.rs\\'" . rust-ts-mode))
-(add-hook 'rust-ts-mode-hook #'eglot-ensure)
+(require 'ansi-color)
+(defun endless/colorize-compilation ()
+  "Colorize from `compilation-filter-start' to `point'."
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region
+     compilation-filter-start (point))))
+
+(add-hook 'compilation-filter-hook
+          #'endless/colorize-compilation)
+
+(add-to-list 'auto-mode-alist '("\\.json\\'" . json-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.toml\\'" . toml-ts-mode))
+
+(add-to-list 'auto-mode-alist '("\\.yaml\\'" . yaml-ts-mode))
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
@@ -348,15 +387,53 @@
 ;; Link up nixd and nil
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-		 '(nix-ts-mode . ("rass" "--" "nixd" "--" "nil"))))
+	       '(nix-ts-mode . ("rass" "--" "nixd" "--" "nil" "--stdio"))))
+
+(define-derived-mode devenv-nix-ts-mode nix-ts-mode "Devenv-Nix"
+  "Derived mode to allow devenv.nix files to use the devenv lsp")
+
+(defun a2z/devenv-nixd-config (&rest _)
+  "Fetch nixd's workspace configuration from `devenv lsp --print-config'."
+  (condition-case err
+      (json-parse-string
+       (shell-command-to-string "devenv lsp --quiet --print-config")
+       :object-type 'plist
+       :array-type 'list)
+    (error (message "devenv lsp --print-config failed: %s" err) nil)))
+
+(add-hook 'nix-ts-mode-hook
+    (lambda ()
+    (when (and (string-match-p "/devenv\\.nix\\'" buffer-file-name)
+	   (not (derived-mode-p 'devenv-nix-ts-mode)))
+    (devenv-nix-ts-mode))))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+  	       '(devenv-nix-ts-mode . ("devenv" "lsp"))))
+
+(add-hook 'devenv-nix-ts-mode-hook (lambda () (setq-local eglot-workspace-configuration #'a2z/devenv-nixd-config)))
+(add-hook 'devenv-nix-ts-mode-hook #'eglot-ensure t)
+
+(use-package rust-mode
+  :init
+  (setq rust-mode-treesitter-derive t))
+
+(use-package rustic
+  :init
+  (setq rustic-lsp-client 'eglot)
+  :config
+  (setq rustic-format-on-save t)
+  :custom
+  (rustic-cargo-use-last-stored-arguments t))
+
+(add-to-list 'auto-mode-alist '("\\.rs\\'" . rustic-mode))
+(add-hook 'rustic-mode-hook #'eglot-ensure)
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
   (setq doom-modeline-height 30
-	doom-modeline-bar-width 5
-	doom-modeline-persp-name t
-	doom-modeline-persp-icon t))
+	doom-modeline-bar-width 5))
 
 (use-package neotree
   :config
@@ -404,7 +481,7 @@
 (setq use-dialog-box nil)    ;; No dialog box
 (setq pop-up-windows nil)    ;; No popup windows
 
-(server-start)
+(if (not server-mode) (server-start))
 
 (use-package sudo-edit
   :config
