@@ -220,7 +220,9 @@
   (a2z/leader-key
     "c" '(:ignore t :wk "Code / Comments")
     "c l" '(comment-line :wk "Comment line")
-	"c a" '(eglot-code-actions :wk "Code Actions"))
+    "c a" '(eglot-code-actions :wk "Code Actions")
+    "c n" '(flymake-goto-next-error :wk "Goto next error")
+    "c p" '(flymake-goto-prev-error :wk "Goto prev error"))
   
   (a2z/leader-key
     "d" '(:ignore t :wk "Dired")
@@ -414,6 +416,15 @@
 (add-hook 'devenv-nix-ts-mode-hook (lambda () (setq-local eglot-workspace-configuration #'a2z/devenv-nixd-config)))
 (add-hook 'devenv-nix-ts-mode-hook #'eglot-ensure t)
 
+(use-package odin-ts-mode
+  :ensure (:host github :repo "Sampie159/odin-ts-mode")
+  :mode "\\.odin\\'")
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '((odin-mode odin-ts-mode) . ("ols"))))
+
+(add-hook 'odin-ts-mode-hook #'eglot-ensure)
+
 (use-package rust-mode
   :init
   (setq rust-mode-treesitter-derive t))
@@ -428,6 +439,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.rs\\'" . rustic-mode))
 (add-hook 'rustic-mode-hook #'eglot-ensure)
+
+;; Fix rust project freezing on launch (if external file got updated do eglot-reconnect)
+(add-hook 'rustic-mode-hook
+          (lambda () (setq-local eglot-ignored-server-capabilities '(:didChangeWatchedFiles))))
 
 (use-package doom-modeline
   :init (doom-modeline-mode 1)

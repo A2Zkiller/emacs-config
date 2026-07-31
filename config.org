@@ -34,6 +34,7 @@
   - [[#compilation-mode-ansi-colors][Compilation Mode Ansi Colors]]
   - [[#config-files][Config Files]]
   - [[#nix][Nix]]
+  - [[#odin][Odin]]
   - [[#rust][Rust]]
 - [[#modeline][MODELINE]]
 - [[#neotree][NEOTREE]]
@@ -322,148 +323,150 @@
 * GENERAL KEYBINDS
 
 #+begin_src emacs-lisp
-  (use-package general
-    :config
-    (general-evil-setup)
+    (use-package general
+      :config
+      (general-evil-setup)
 
-    ;; Setup SPC as global leader key
-    (general-create-definer a2z/leader-key
-      :states '(normal insert visual emacs)
-      :keymaps 'override
-      :prefix "SPC"
-      :global-prefix "M-SPC")
+      ;; Setup SPC as global leader key
+      (general-create-definer a2z/leader-key
+        :states '(normal insert visual emacs)
+        :keymaps 'override
+        :prefix "SPC"
+        :global-prefix "M-SPC")
 
-    (a2z/leader-key
-      "SPC" '(counsel-M-x :wk "Counsel M-x")
-      "." '(find-file :wk "Find file")
-      "f r" '(counsel-recentf :wk "Find recent files")
-      "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
-      "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
-      "f d" '(dashboard-open :wk "Open dashboard"))
+      (a2z/leader-key
+        "SPC" '(counsel-M-x :wk "Counsel M-x")
+        "." '(find-file :wk "Find file")
+        "f r" '(counsel-recentf :wk "Find recent files")
+        "f c" '((lambda () (interactive) (find-file (expand-file-name "config.org" user-emacs-directory))) :wk "Edit Config")
+        "r c" '((lambda () (interactive) (load-file user-init-file)) :wk "Reload Config")
+        "f d" '(dashboard-open :wk "Open dashboard"))
 
-    (a2z/leader-key
-      "b" '(:ignore t :wk "Bookmarks/Buffers")
-      "b b" '(switch-to-buffer :wk "Switch to buffer")
-      "b c" '(clone-indirect-buffer :wk "Create indirect buffer copy in a split")
-      "b C" '(clone-indirect-buffer-other-window :wk "Clone indirect buffer in new window")
-      "b d" '(bookmark-delete :wk "Delete bookmark")
-      "b i" '(ibuffer :wk "Ibuffer")
-      "b k" '(kill-current-buffer :wk "Kill current buffer")
-      "b K" '(kill-some-buffers :wk "Kill multiple buffers")
-      "b l" '(list-bookmarks :wk "List bookmarks")
-      "b m" '(bookmark-set :wk "Set bookmark")
-      "b n" '(next-buffer :wk "Next buffer")
-      "b p" '(previous-buffer :wk "Previous buffer")
-      "b r" '(revert-buffer :wk "Reload buffer")
-      "b R" '(rename-buffer :wk "Rename buffer")
-      "b s" '(basic-save-buffer :wk "Save buffer")
-      "b S" '(save-some-buffers :wk "Save multiple buffers")
-      "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
+      (a2z/leader-key
+        "b" '(:ignore t :wk "Bookmarks/Buffers")
+        "b b" '(switch-to-buffer :wk "Switch to buffer")
+        "b c" '(clone-indirect-buffer :wk "Create indirect buffer copy in a split")
+        "b C" '(clone-indirect-buffer-other-window :wk "Clone indirect buffer in new window")
+        "b d" '(bookmark-delete :wk "Delete bookmark")
+        "b i" '(ibuffer :wk "Ibuffer")
+        "b k" '(kill-current-buffer :wk "Kill current buffer")
+        "b K" '(kill-some-buffers :wk "Kill multiple buffers")
+        "b l" '(list-bookmarks :wk "List bookmarks")
+        "b m" '(bookmark-set :wk "Set bookmark")
+        "b n" '(next-buffer :wk "Next buffer")
+        "b p" '(previous-buffer :wk "Previous buffer")
+        "b r" '(revert-buffer :wk "Reload buffer")
+        "b R" '(rename-buffer :wk "Rename buffer")
+        "b s" '(basic-save-buffer :wk "Save buffer")
+        "b S" '(save-some-buffers :wk "Save multiple buffers")
+        "b w" '(bookmark-save :wk "Save current bookmarks to bookmark file"))
 
-    (a2z/leader-key
-      "c" '(:ignore t :wk "Code / Comments")
-      "c l" '(comment-line :wk "Comment line")
-      "c a" '(eglot-code-actions :wk "Code Actions"))
-    
-    (a2z/leader-key
-      "d" '(:ignore t :wk "Dired")
-      "d d" '(dired :wk "Open Dired")
-      "d j" '(dired-jump :wk "Jump to current buffer dired")
-      "d n" '(neotree-dir :wk "Open directory in neotree")
-      "d p" '(dired-preview-mode :wk "Toggle dired preview")
-      "d P" '(project-dired :wk "Project Dired"))
+      (a2z/leader-key
+        "c" '(:ignore t :wk "Code / Comments")
+        "c l" '(comment-line :wk "Comment line")
+        "c a" '(eglot-code-actions :wk "Code Actions")
+        "c n" '(flymake-goto-next-error :wk "Goto next error")
+        "c p" '(flymake-goto-prev-error :wk "Goto prev error"))
+      
+      (a2z/leader-key
+        "d" '(:ignore t :wk "Dired")
+        "d d" '(dired :wk "Open Dired")
+        "d j" '(dired-jump :wk "Jump to current buffer dired")
+        "d n" '(neotree-dir :wk "Open directory in neotree")
+        "d p" '(dired-preview-mode :wk "Toggle dired preview")
+        "d P" '(project-dired :wk "Project Dired"))
 
-    (a2z/leader-key
-      "e" '(:ignore t :wk "Evaluate")
-      "e b" '(eval-buffer :wk "Evaluate Buffer")
-      "e d" '(eval-defun :wk "Evaluate Defun")
-      "e e" '(eval-expression :wk "Evaluate Expression")
-      "e r" '(eval-region :wk "Evaluate Region"))
+      (a2z/leader-key
+        "e" '(:ignore t :wk "Evaluate")
+        "e b" '(eval-buffer :wk "Evaluate Buffer")
+        "e d" '(eval-defun :wk "Evaluate Defun")
+        "e e" '(eval-expression :wk "Evaluate Expression")
+        "e r" '(eval-region :wk "Evaluate Region"))
 
-    (a2z/leader-key
-      "g" '(:ignore t :wk "Git")
-      "g g" '(magit :wk "Launch Magit")
-      "g j" '(majutsu :wk "Launch Majutsu"))
+      (a2z/leader-key
+        "g" '(:ignore t :wk "Git")
+        "g g" '(magit :wk "Launch Magit")
+        "g j" '(majutsu :wk "Launch Majutsu"))
 
-    (a2z/leader-key
-      "h" '(:ignore t :wk "Help")
-      "h a" '(counsel-apropos :wk "Apropos")
-      "h b" '(describe-bindings :wk "Describe bindings")
-      "h c" '(describe-char :wk "Describe character under cursor")
-      "h d" '(:ignore t :wk "Emacs documentation")
-      "h d a" '(about-emacs :wk "About Emacs")
-      "h d d" '(view-emacs-debugging :wk "View Emacs debugging")
-      "h d f" '(view-emacs-FAQ :wk "View Emacs FAQ")
-      "h d m" '(info-emacs-manual :wk "The Emacs manual")
-      "h d n" '(view-emacs-news :wk "View Emacs news")
-      "h d o" '(describe-distribution :wk "How to obtain Emacs")
-      "h d p" '(view-emacs-problems :wk "View Emacs problems")
-      "h d t" '(view-emacs-todo :wk "View Emacs todo")
-      "h d w" '(describe-no-warranty :wk "Describe no warranty")
-      "h e" '(view-echo-area-messages :wk "View echo area messages")
-      "h f" '(describe-function :wk "Describe function")
-      "h F" '(describe-face :wk "Describe face")
-      "h g" '(describe-gnu-project :wk "Describe GNU Project")
-      "h i" '(info :wk "Info")
-      "h I" '(describe-input-method :wk "Describe input method")
-      "h k" '(describe-key :wk "Describe key")
-      "h l" '(view-lossage :wk "Display recent keystrokes and the commands run")
-      "h L" '(describe-language-environment :wk "Describe language environment")
-      "h m" '(describe-mode :wk "Describe mode")
-      "h t" '(load-theme :wk "Load theme")
-      "h v" '(describe-variable :wk "Describe variable")
-      "h w" '(where-is :wk "Prints keybinding for command if set")
-      "h x" '(describe-command :wk "Display full documentation for command"))
+      (a2z/leader-key
+        "h" '(:ignore t :wk "Help")
+        "h a" '(counsel-apropos :wk "Apropos")
+        "h b" '(describe-bindings :wk "Describe bindings")
+        "h c" '(describe-char :wk "Describe character under cursor")
+        "h d" '(:ignore t :wk "Emacs documentation")
+        "h d a" '(about-emacs :wk "About Emacs")
+        "h d d" '(view-emacs-debugging :wk "View Emacs debugging")
+        "h d f" '(view-emacs-FAQ :wk "View Emacs FAQ")
+        "h d m" '(info-emacs-manual :wk "The Emacs manual")
+        "h d n" '(view-emacs-news :wk "View Emacs news")
+        "h d o" '(describe-distribution :wk "How to obtain Emacs")
+        "h d p" '(view-emacs-problems :wk "View Emacs problems")
+        "h d t" '(view-emacs-todo :wk "View Emacs todo")
+        "h d w" '(describe-no-warranty :wk "Describe no warranty")
+        "h e" '(view-echo-area-messages :wk "View echo area messages")
+        "h f" '(describe-function :wk "Describe function")
+        "h F" '(describe-face :wk "Describe face")
+        "h g" '(describe-gnu-project :wk "Describe GNU Project")
+        "h i" '(info :wk "Info")
+        "h I" '(describe-input-method :wk "Describe input method")
+        "h k" '(describe-key :wk "Describe key")
+        "h l" '(view-lossage :wk "Display recent keystrokes and the commands run")
+        "h L" '(describe-language-environment :wk "Describe language environment")
+        "h m" '(describe-mode :wk "Describe mode")
+        "h t" '(load-theme :wk "Load theme")
+        "h v" '(describe-variable :wk "Describe variable")
+        "h w" '(where-is :wk "Prints keybinding for command if set")
+        "h x" '(describe-command :wk "Display full documentation for command"))
 
-    (a2z/leader-key
-      "m" '(:ignore t :wk "Org")
-      "m a" '(org-agenda :wk "Org agenda")
-      "m e" '(org-export-dispatch :wk "Org export dispatch")
-      "m i" '(org-toggle-item :wk "Org toggle item")
-      "m t" '(org-todo :wk "Org todo")
-      "m B" '(org-babel-tangle :wk "Org babel tangle")
-      "m T" '(org-todo-list :wk "Org todo list"))
-    
-    (a2z/leader-key
-      "m b" '(:ignore t :wk "Tables")
-      "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
-    
-    (a2z/leader-key
-      "m d" '(:ignore t :wk "Date/deadline")
-      "m d t" '(org-time-stamp :wk "Org time stamp"))
+      (a2z/leader-key
+        "m" '(:ignore t :wk "Org")
+        "m a" '(org-agenda :wk "Org agenda")
+        "m e" '(org-export-dispatch :wk "Org export dispatch")
+        "m i" '(org-toggle-item :wk "Org toggle item")
+        "m t" '(org-todo :wk "Org todo")
+        "m B" '(org-babel-tangle :wk "Org babel tangle")
+        "m T" '(org-todo-list :wk "Org todo list"))
+      
+      (a2z/leader-key
+        "m b" '(:ignore t :wk "Tables")
+        "m b -" '(org-table-insert-hline :wk "Insert hline in table"))
+      
+      (a2z/leader-key
+        "m d" '(:ignore t :wk "Date/deadline")
+        "m d t" '(org-time-stamp :wk "Org time stamp"))
 
-    (a2z/leader-key
-      "p" '(:ignore t :wk "Project")
-      "p k" '(project-kill-buffers :wk "Project kill buffers")
-      "p b" '(project-switch-to-buffer :wk "Project switch to buffer")
-      "p B" '(project-list-buffers :wk "Project list buffers"))
+      (a2z/leader-key
+        "p" '(:ignore t :wk "Project")
+        "p k" '(project-kill-buffers :wk "Project kill buffers")
+        "p b" '(project-switch-to-buffer :wk "Project switch to buffer")
+        "p B" '(project-list-buffers :wk "Project list buffers"))
 
-    (a2z/leader-key
-      "t" '(:ignore t :wk "Toggle")
-      "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
-      "t t" '(visual-line-mode :wk "Toggle visual line mode")
-      "t v" '(vterm-toggle :wk "Toggle vterm")
-      "t n" '(neotree-toggle :wk "Toggle neotree"))
-    
-    (a2z/leader-key
-      "w" '(:ignore t :wk "Windows")
-      ;; Window splits
-      "w c" '(evil-window-delete :wk "Close window")
-      "w n" '(evil-window-new :wk "New window")
-      "w s" '(evil-window-split :wk "Horizontal split window")
-      "w v" '(evil-window-vsplit :wk "Vertical split window")
-      ;; Window motions
-      "w h" '(evil-window-left :wk "Window left")
-      "w j" '(evil-window-down :wk "Window down")
-      "w k" '(evil-window-up :wk "Window up")
-      "w l" '(evil-window-right :wk "Window right")
-      "w w" '(evil-window-next :wk "Goto next window")
-      ;; Move Windows
-      "w H" '(buf-move-left :wk "Buffer move left")
-      "w J" '(buf-move-down :wk "Buffer move down")
-      "w K" '(buf-move-up :wk "Buffer move up")
-      "w L" '(buf-move-right :wk "Buffer move right"))
-    )
+      (a2z/leader-key
+        "t" '(:ignore t :wk "Toggle")
+        "t l" '(display-line-numbers-mode :wk "Toggle line numbers")
+        "t t" '(visual-line-mode :wk "Toggle visual line mode")
+        "t v" '(vterm-toggle :wk "Toggle vterm")
+        "t n" '(neotree-toggle :wk "Toggle neotree"))
+      
+      (a2z/leader-key
+        "w" '(:ignore t :wk "Windows")
+        ;; Window splits
+        "w c" '(evil-window-delete :wk "Close window")
+        "w n" '(evil-window-new :wk "New window")
+        "w s" '(evil-window-split :wk "Horizontal split window")
+        "w v" '(evil-window-vsplit :wk "Vertical split window")
+        ;; Window motions
+        "w h" '(evil-window-left :wk "Window left")
+        "w j" '(evil-window-down :wk "Window down")
+        "w k" '(evil-window-up :wk "Window up")
+        "w l" '(evil-window-right :wk "Window right")
+        "w w" '(evil-window-next :wk "Goto next window")
+        ;; Move Windows
+        "w H" '(buf-move-left :wk "Buffer move left")
+        "w J" '(buf-move-down :wk "Buffer move down")
+        "w K" '(buf-move-up :wk "Buffer move up")
+        "w L" '(buf-move-right :wk "Buffer move right"))
+      )
 #+end_src
 
 
@@ -608,6 +611,18 @@ Set treesitter lock mode for max detail when selecting colors
   (add-hook 'devenv-nix-ts-mode-hook #'eglot-ensure t)
 #+end_src
 
+** Odin
+
+#+begin_src emacs-lisp
+  (use-package odin-ts-mode
+    :ensure (:host github :repo "Sampie159/odin-ts-mode")
+    :mode "\\.odin\\'")
+
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs '((odin-mode odin-ts-mode) . ("ols"))))
+
+  (add-hook 'odin-ts-mode-hook #'eglot-ensure)
+#+end_src
 
 ** Rust
 
@@ -626,6 +641,10 @@ Set treesitter lock mode for max detail when selecting colors
 
   (add-to-list 'auto-mode-alist '("\\.rs\\'" . rustic-mode))
   (add-hook 'rustic-mode-hook #'eglot-ensure)
+
+  ;; Fix rust project freezing on launch (if external file got updated do eglot-reconnect)
+  (add-hook 'rustic-mode-hook
+            (lambda () (setq-local eglot-ignored-server-capabilities '(:didChangeWatchedFiles))))
 #+end_src
 
 
