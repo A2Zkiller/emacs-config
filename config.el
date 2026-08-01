@@ -220,7 +220,11 @@
   (a2z/leader-key
     "c" '(:ignore t :wk "Code / Comments")
     "c l" '(comment-line :wk "Comment line")
+    "c c" '(compile :wk "Compile")
+    "c r" '(recompile :wk "Recompile")
+    "c f" '(eglot-format-buffer :wk "Format buffer")
     "c a" '(eglot-code-actions :wk "Code Actions")
+    "c d" '(eldoc :wk "Eldoc")
     "c n" '(flymake-goto-next-error :wk "Goto next error")
     "c p" '(flymake-goto-prev-error :wk "Goto prev error"))
   
@@ -229,8 +233,8 @@
     "d d" '(dired :wk "Open Dired")
     "d j" '(dired-jump :wk "Jump to current buffer dired")
     "d n" '(neotree-dir :wk "Open directory in neotree")
-    "d p" '(dired-preview-mode :wk "Toggle dired preview")
-    "d P" '(project-dired :wk "Project Dired"))
+    "d P" '(dired-preview-mode :wk "Toggle dired preview")
+    "d p" '(project-dired :wk "Project Dired"))
 
   (a2z/leader-key
     "e" '(:ignore t :wk "Evaluate")
@@ -415,6 +419,9 @@
 
 (add-hook 'devenv-nix-ts-mode-hook (lambda () (setq-local eglot-workspace-configuration #'a2z/devenv-nixd-config)))
 (add-hook 'devenv-nix-ts-mode-hook #'eglot-ensure t)
+
+(with-eval-after-load 'projectile
+  (add-to-list 'projectile-project-root-files-bottom-up "devenv.nix"))
 
 (use-package odin-ts-mode
   :ensure (:host github :repo "Sampie159/odin-ts-mode")
