@@ -4,12 +4,13 @@
 #+STARTUP: showeverything
 #+OPTIONS: toc:2
 
-* TABLE OF CONTENTS                                                   :TOC_2:
+* TABLE OF CONTENTS                                                  :TOC_2:
 - [[#load-first][LOAD FIRST]]
   - [[#elpaca][Elpaca]]
   - [[#disable-resize-on-startup][Disable Resize on Startup]]
   - [[#load-theme][Load Theme]]
 - [[#all-the-icons][ALL THE ICONS]]
+- [[#auctex][Auctex]]
 - [[#buffer-move][BUFFER MOVE]]
 - [[#cleanup][CLEANUP]]
 - [[#company][COMPANY]]
@@ -36,12 +37,14 @@
   - [[#nix][Nix]]
   - [[#odin][Odin]]
   - [[#rust][Rust]]
+  - [[#slang][Slang]]
 - [[#modeline][MODELINE]]
 - [[#neotree][NEOTREE]]
 - [[#org-mode][ORG MODE]]
   - [[#enable-table-of-contents][Enable Table of Contents]]
   - [[#enable-org-bullets][Enable Org Bullets]]
   - [[#enable-org-tempo][Enable Org Tempo]]
+  - [[#set-org-directory][Set Org Directory]]
 - [[#projectile][PROJECTILE]]
 - [[#rainbow-delimiters][RAINBOW DELIMITERS]]
 - [[#rainbow-mode][RAINBOW MODE]]
@@ -121,6 +124,7 @@
     (load-theme 'catppuccin :no-confirm))
 #+end_src
 
+
 * ALL THE ICONS
 
 #+begin_src emacs-lisp
@@ -131,6 +135,13 @@
     :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 #+end_src
 
+
+* Auctex
+
+#+begin_src emacs-lisp
+  (use-package auctex
+    :ensure nil)
+#+end_src
 
 * BUFFER MOVE
 
@@ -660,6 +671,22 @@ Set treesitter lock mode for max detail when selecting colors
 #+end_src
 
 
+** Slang
+
+#+begin_src emacs-lisp
+  (use-package slang-ts-mode
+    :vc (:url "https://github.com/Vostranox/slang-ts-mode")
+    :mode (("\\.slang\\'" . slang-ts-mode)
+  	("\\.sl\\'" . slang-ts-mode)
+  	("\\.slangh\\'" . slang-ts-mode)))
+
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs '(slang-ts-mode . ("slangd"))))
+
+  (add-hook 'slang-ts-mode-hook #'eglot-ensure)
+#+end_src
+
+
 * MODELINE
 
 #+begin_src emacs-lisp
@@ -713,6 +740,12 @@ Set treesitter lock mode for max detail when selecting colors
   (require 'org-tempo)
 #+end_src
 
+** Set Org Directory
+
+#+begin_src emacs-lisp
+  (setq org-directory "~/Org")
+  (add-to-list 'org-agenda-files org-directory)
+#+end_src
 
 * PROJECTILE
 

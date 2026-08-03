@@ -55,6 +55,9 @@
 (use-package all-the-icons-dired
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
+(use-package auctex
+  :ensure nil)
+
 (use-package buffer-move)
 
 ;; Move backups (filename~) to separate directory
@@ -451,6 +454,17 @@
 (add-hook 'rustic-mode-hook
           (lambda () (setq-local eglot-ignored-server-capabilities '(:didChangeWatchedFiles))))
 
+(use-package slang-ts-mode
+  :vc (:url "https://github.com/Vostranox/slang-ts-mode")
+  :mode (("\\.slang\\'" . slang-ts-mode)
+	("\\.sl\\'" . slang-ts-mode)
+	("\\.slangh\\'" . slang-ts-mode)))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs '(slang-ts-mode . ("slangd"))))
+
+(add-hook 'slang-ts-mode-hook #'eglot-ensure)
+
 (use-package doom-modeline
   :init (doom-modeline-mode 1)
   :config
@@ -478,6 +492,9 @@
   (add-hook 'org-mode-hook (lambda () (org-bullets-mode 1))))
 
 (require 'org-tempo)
+
+(setq org-directory "~/Org")
+(add-to-list 'org-agenda-files org-directory)
 
 (use-package projectile
   :config
