@@ -61,6 +61,11 @@
 (setq org-latex-compiler "pdflatex")
 (setq org-preview-latex-default-process 'dvisvgm)
 
+(use-package beacon
+  :config
+  (setq beacon-blink-when-point-moves-vertically t)
+  (beacon-mode 1))
+
 (use-package buffer-move)
 
 ;; Move backups (filename~) to separate directory
@@ -152,10 +157,11 @@
 
 (use-package evil-org
   :after org evil
-  :hook (org-mode . (lambda () evil-org-mode))
   :config
   (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
+  (evil-org-agenda-set-keys)
+  ;; not working in :hook
+  (add-hook 'org-mode-hook 'evil-org-mode))
 
 (use-package evil-surround
   :after evil

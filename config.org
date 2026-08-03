@@ -11,6 +11,7 @@
   - [[#load-theme][Load Theme]]
 - [[#all-the-icons][ALL THE ICONS]]
 - [[#auctex][AUCTEX]]
+- [[#beacon][BEACON]]
 - [[#buffer-move][BUFFER MOVE]]
 - [[#cleanup][CLEANUP]]
 - [[#company][COMPANY]]
@@ -145,6 +146,17 @@
   (setq org-latex-compiler "pdflatex")
   (setq org-preview-latex-default-process 'dvisvgm)
 #+end_src
+
+
+* BEACON
+
+#+begin_src emacs-lisp
+    (use-package beacon
+      :config
+      (setq beacon-blink-when-point-moves-vertically t)
+      (beacon-mode 1))
+#+end_src
+
 
 * BUFFER MOVE
 
@@ -289,10 +301,11 @@
 #+begin_src emacs-lisp
   (use-package evil-org
     :after org evil
-    :hook (org-mode . (lambda () evil-org-mode))
     :config
     (require 'evil-org-agenda)
-    (evil-org-agenda-set-keys))
+    (evil-org-agenda-set-keys)
+    ;; not working in :hook
+    (add-hook 'org-mode-hook 'evil-org-mode))
 #+end_src
 
 ** Evil Surround
