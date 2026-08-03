@@ -10,7 +10,7 @@
   - [[#disable-resize-on-startup][Disable Resize on Startup]]
   - [[#load-theme][Load Theme]]
 - [[#all-the-icons][ALL THE ICONS]]
-- [[#auctex][Auctex]]
+- [[#auctex][AUCTEX]]
 - [[#buffer-move][BUFFER MOVE]]
 - [[#cleanup][CLEANUP]]
 - [[#company][COMPANY]]
@@ -136,11 +136,14 @@
 #+end_src
 
 
-* Auctex
+* AUCTEX
 
 #+begin_src emacs-lisp
   (use-package auctex
     :ensure nil)
+
+  (setq org-latex-compiler "pdflatex")
+  (setq org-preview-latex-default-process 'dvisvgm)
 #+end_src
 
 * BUFFER MOVE
@@ -746,6 +749,7 @@ Set treesitter lock mode for max detail when selecting colors
   (setq org-directory "~/Org")
   (add-to-list 'org-agenda-files org-directory)
 #+end_src
+
 
 * PROJECTILE
 

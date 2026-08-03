@@ -58,6 +58,9 @@
 (use-package auctex
   :ensure nil)
 
+(setq org-latex-compiler "pdflatex")
+(setq org-preview-latex-default-process 'dvisvgm)
+
 (use-package buffer-move)
 
 ;; Move backups (filename~) to separate directory
