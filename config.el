@@ -137,6 +137,10 @@
   :after eglot
   :config (eglot-booster-mode))
 
+  ;; Extra settings to speed up eglot
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
+
 (use-package evil
   :init
   (setq evil-want-keybinding nil)
@@ -453,6 +457,7 @@
   (setq rustic-lsp-client 'eglot)
   :config
   (setq rustic-format-on-save t)
+  (setq rustic-rustfmt-args "--edition 2024")
   :custom
   (rustic-cargo-use-last-stored-arguments t))
 
@@ -507,7 +512,10 @@
 
 (use-package projectile
   :config
-  (projectile-mode 1))
+  (projectile-mode 1)
+  (setq projectile-globally-ignored-directories
+	(append '("target" ".git" ".jj") projectile-globally-ignored-directories))
+  (setq projectile-enable-caching t))
 
 (use-package rainbow-delimiters
   :hook ((emacs-lisp-mode . rainbow-delimiters-mode)))
