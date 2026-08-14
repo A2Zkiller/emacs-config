@@ -195,6 +195,19 @@
 ;; Emacs Client
 (add-to-list 'default-frame-alist '(font . "JetBrainsMono Nerd Font-14"))
 
+; Source - https://stackoverflow.com/a/9697222
+					; Posted by Gerstmann, modified by community. See post 'Timeline' for change history
+					; Retrieved 2026-08-11, License - CC BY-SA 3.0
+(defun comment-or-uncomment-region-or-line ()
+  "Comments or uncomments the region or the current line if there's no active region."
+  (interactive)
+  (let (beg end)
+    (if (region-active-p)
+        (setq beg (region-beginning) end (region-end))
+      (setq beg (line-beginning-position) end (line-end-position)))
+    (comment-or-uncomment-region beg end)
+    (next-line)))
+
 (use-package general
   :config
   (general-evil-setup)
@@ -235,7 +248,7 @@
 
   (a2z/leader-key
     "c" '(:ignore t :wk "Code / Comments")
-    "c l" '(comment-line :wk "Comment line")
+    "c l" '(comment-or-uncomment-region-or-line :wk "Toggle comment region or line")
     "c c" '(compile :wk "Compile")
     "c r" '(recompile :wk "Recompile")
     "c f" '(eglot-format-buffer :wk "Format buffer")
@@ -309,6 +322,8 @@
   
   (a2z/leader-key
     "m d" '(:ignore t :wk "Date/deadline")
+    "m d s" '(org-schedule :wk "Org schedule")
+    "m d d" '(org-deadline :wk "Org deadline")
     "m d t" '(org-time-stamp :wk "Org time stamp"))
 
   (a2z/leader-key
@@ -352,6 +367,8 @@
 (global-visual-line-mode t)
 (column-number-mode t)
 (setq display-line-numbers-type 'relative)
+
+(add-hook 'ibuffer-mode-hook 'ibuffer-auto-mode)
 
 (use-package counsel
   :after ivy
