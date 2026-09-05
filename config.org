@@ -6,6 +6,7 @@
 
 * TABLE OF CONTENTS                                                  :TOC_2:
 - [[#load-first][LOAD FIRST]]
+  - [[#lexical-bindings][Lexical Bindings]]
   - [[#elpaca][Elpaca]]
   - [[#disable-resize-on-startup][Disable Resize on Startup]]
   - [[#load-theme][Load Theme]]
@@ -64,6 +65,12 @@
 - [[#which-key][WHICH KEY]]
 
 * LOAD FIRST
+
+** Lexical Bindings
+
+#+begin_src emacs-lisp
+  ;; -*- lexical-binding: t; -*-
+#+end_src
 
 ** Elpaca
 
