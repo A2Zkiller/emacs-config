@@ -154,10 +154,10 @@
 * BEACON
 
 #+begin_src emacs-lisp
-    (use-package beacon
-      :config
-      (setq beacon-blink-when-point-moves-vertically t)
-      (beacon-mode 1))
+  (use-package beacon
+    :config
+    (setq beacon-blink-when-point-moves-vertically t)
+    (beacon-mode 1))
 #+end_src
 
 
