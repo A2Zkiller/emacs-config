@@ -25,6 +25,8 @@
 - [[#evil][EVIL]]
   - [[#evil-org][Evil Org]]
   - [[#evil-surround][Evil Surround]]
+- [[#epg][EPG]]
+  - [[#use-emacs-pinentry][Use emacs pinentry]]
 - [[#fonts][FONTS]]
   - [[#set-font][Set Font]]
 - [[#functions][FUNCTIONS]]
@@ -331,6 +333,11 @@
     (global-evil-surround-mode 1))
 #+end_src
 
+* EPG
+** Use emacs pinentry
+#+begin_src emacs-lisp
+  (setq epg-pinentry-mode 'loopback)
+#+end_src
 * FONTS
 
 ** Set Font

@@ -174,6 +174,8 @@
   :config
   (global-evil-surround-mode 1))
 
+(setq epg-pinentry-mode 'loopback)
+
 (set-face-attribute 'default nil
 		    :font "JetBrainsMono Nerd Font"
 		    :height 140
