@@ -68,10 +68,31 @@
   (TeX-parse-self t))
 
 (with-eval-after-load 'tex
-  (setq preview-auto-cache-preamble nil))
+  (setq preview-auto-cache-preamble nil)
+  (setq TeX-view-program-selection '((output-pdf "Zathura"))))
 
 (setq org-latex-compiler "pdflatex")
 (setq org-preview-latex-default-process 'dvisvgm)
+
+(defvar-local a2z/compile-on-save nil)
+
+(defun a2z/toggle-compile-on-save ()
+  (interactive)
+  (setq a2z/compile-on-save (not a2z/compile-on-save))
+  (message "Compile on save: %s" (if a2z/compile-on-save "on" "off")))
+
+(defun a2z/latex-compile-if-enabled ()
+  (when a2z/compile-on-save
+    (TeX-command "LaTeX" 'TeX-master-file -1)))
+
+(add-hook 'LaTeX-mode-hook
+	  (lambda ()
+	    (add-hook 'after-save-hook #'a2z/latex-compile-if-enabled nil t)))
+
+(with-eval-after-load 'tex
+  (a2z/leader-key
+    :keymaps 'LaTeX-mode-map
+    "m c" '(a2z/toggle-compile-on-save :wk "Toggle compile on save")))
 
 (use-package beacon
   :config
