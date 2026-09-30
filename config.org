@@ -39,6 +39,7 @@
   - [[#enable-ibuffer-auto-mode-on-launch][Enable ibuffer auto mode on launch]]
 - [[#ivy--counsel][IVY + COUNSEL]]
 - [[#language-support][LANGUAGE SUPPORT]]
+  - [[#eglot-lsp-config-helper-functions][Eglot LSP Config Helper Functions]]
   - [[#treesitter-lock-level][Treesitter Lock Level]]
   - [[#compilation-mode-ansi-colors][Compilation Mode Ansi Colors]]
   - [[#config-files][Config Files]]
@@ -640,6 +641,23 @@
 
 
 * LANGUAGE SUPPORT
+** Eglot LSP Config Helper Functions
+#+begin_src emacs-lisp
+  (defvar a2z/lsp-configs nil
+    "Alist of (MODE . workspace-configuration) for Eglot.")
+
+  (defun a2z/lsp-config-add (mode config)
+    (setf (alist-get mode a2z/lsp-configs) config))
+
+  (defun a2z/lsp-dir-locals ()
+    (catch 'found
+      (dolist (entry a2z/lsp-configs)
+        (when (derived-mode-p (car entry))
+  	(throw 'found
+  	       `("/" . ((eglot-workspace-configuration . ,(cdr entry)))))))))
+
+  (add-hook 'hack-dir-local-get-variables-functions #'a2z/lsp-dir-locals)
+#+end_src
 
 ** Treesitter Lock Level
 Set treesitter lock mode for max detail when selecting colors
@@ -687,6 +705,8 @@ Set treesitter lock mode for max detail when selecting colors
 #+begin_src emacs-lisp
   (use-package nix-ts-mode
     :mode "\\.nix\\'")
+
+  (a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))))
 
   (add-hook 'nix-ts-mode-hook #'eglot-ensure)
 

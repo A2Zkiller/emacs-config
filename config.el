@@ -435,6 +435,21 @@
   :config
   (ivy-set-display-transformer 'ivy-switch-buffer 'ivy-switch-buffer-transformer))
 
+(defvar a2z/lsp-configs nil
+  "Alist of (MODE . workspace-configuration) for Eglot.")
+
+(defun a2z/lsp-config-add (mode config)
+  (setf (alist-get mode a2z/lsp-configs) config))
+
+(defun a2z/lsp-dir-locals ()
+  (catch 'found
+    (dolist (entry a2z/lsp-configs)
+      (when (derived-mode-p (car entry))
+	(throw 'found
+	       `("/" . ((eglot-workspace-configuration . ,(cdr entry)))))))))
+
+(add-hook 'hack-dir-local-get-variables-functions #'a2z/lsp-dir-locals)
+
 (setq treesit-font-lock-level 4)
 
 (require 'ansi-color)
@@ -455,6 +470,8 @@
 
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
+
+(a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))))
 
 (add-hook 'nix-ts-mode-hook #'eglot-ensure)
 
