@@ -487,22 +487,19 @@
   "Fetch nixd's workspace configuration from `devenv lsp --print-config'."
   (condition-case err
       (json-parse-string
-       (shell-command-to-string "devenv lsp --quiet --print-config")
+       (shell-command-to-string "devenv lsp --quiet --print-config 2>/dev/null")
        :object-type 'plist
        :array-type 'list)
     (error (message "devenv lsp --print-config failed: %s" err) nil)))
 
-(add-hook 'nix-ts-mode-hook
-    (lambda ()
-    (when (and (string-match-p "/devenv\\.nix\\'" buffer-file-name)
-	   (not (derived-mode-p 'devenv-nix-ts-mode)))
-    (devenv-nix-ts-mode))))
+(add-to-list 'auto-mode-alist '("/devenv\\.nix\\'" . devenv-nix-ts-mode))
 
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
   	       '(devenv-nix-ts-mode . ("devenv" "lsp"))))
 
-(add-hook 'devenv-nix-ts-mode-hook (lambda () (setq-local eglot-workspace-configuration #'a2z/devenv-nixd-config)))
+(a2z/lsp-config-add 'devenv-nix-ts-mode #'a2z/devenv-nixd-config)
+
 (add-hook 'devenv-nix-ts-mode-hook #'eglot-ensure t)
 
 (with-eval-after-load 'projectile
