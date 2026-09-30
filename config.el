@@ -57,8 +57,18 @@
 (use-package all-the-icons-dired
   :hook (dired-mode . (lambda () (all-the-icons-dired-mode t))))
 
-(use-package auctex
+(use-package tex-site
   :ensure nil)
+
+(use-package tex
+  :ensure nil
+  :defer t
+  :custom
+  (TeX-auto-save t)
+  (TeX-parse-self t))
+
+(with-eval-after-load 'tex
+  (setq preview-auto-cache-preamble nil))
 
 (setq org-latex-compiler "pdflatex")
 (setq org-preview-latex-default-process 'dvisvgm)
