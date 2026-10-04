@@ -47,6 +47,7 @@
   - [[#config-files][Config Files]]
   - [[#nix][Nix]]
   - [[#odin][Odin]]
+  - [[#python][Python]]
   - [[#rust][Rust]]
   - [[#slang][Slang]]
 - [[#modeline][MODELINE]]
@@ -830,6 +831,13 @@ Set treesitter lock mode for max detail when selecting colors
 #+end_src
 
 
+** Python
+
+#+begin_src emacs-lisp
+  (add-to-list 'trusted-content "~/Projects/Python/")
+#+end_src
+
+
 ** Rust
 
 #+begin_src emacs-lisp
@@ -852,6 +860,8 @@ Set treesitter lock mode for max detail when selecting colors
   ;; Fix rust project freezing on launch (if external file got updated do eglot-reconnect)
   (add-hook 'rustic-mode-hook
             (lambda () (setq-local eglot-ignored-server-capabilities '(:didChangeWatchedFiles))))
+
+  (add-to-list 'trusted-content "~/Projects/Rust/")
 #+end_src
 
 
