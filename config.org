@@ -834,6 +834,13 @@ Set treesitter lock mode for max detail when selecting colors
 ** Python
 
 #+begin_src emacs-lisp
+  (use-package python
+    :ensure nil
+    :init
+    (when (treesit-language-available-p 'python)
+      (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode)))
+    :hook (python-base-mode . eglot-ensure))
+
   (add-to-list 'trusted-content "~/Projects/Python/")
 #+end_src
 

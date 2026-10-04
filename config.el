@@ -556,6 +556,15 @@
 
 (add-hook 'odin-ts-mode-hook #'eglot-ensure)
 
+(use-package python
+  :ensure nil
+  :init
+  (when (treesit-language-available-p 'python)
+    (add-to-list 'major-mode-remap-alist '(python-mode . python-ts-mode)))
+  :hook (python-base-mode . eglot-ensure))
+
+(add-to-list 'trusted-content "~/Projects/Python/")
+
 (use-package rust-mode
   :init
   (setq rust-mode-treesitter-derive t))
@@ -575,6 +584,8 @@
 ;; Fix rust project freezing on launch (if external file got updated do eglot-reconnect)
 (add-hook 'rustic-mode-hook
           (lambda () (setq-local eglot-ignored-server-capabilities '(:didChangeWatchedFiles))))
+
+(add-to-list 'trusted-content "~/Projects/Rust/")
 
 (use-package slang-ts-mode
   :vc (:url "https://github.com/Vostranox/slang-ts-mode")
