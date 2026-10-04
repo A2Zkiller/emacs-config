@@ -119,6 +119,7 @@
   (corfu-cycle t)           ;; Enable cycling for `corfu-next/previous'
   (corfu-preselect 'prompt) ;; Always preselect the prompt
   (corfu-preview-current nil) 
+  (corfu-on-exact-match nil)
   
   ;; Use TAB for cycling, default is `corfu-complete'.
   :bind
@@ -141,7 +142,19 @@
   ;; completion functions takes precedence over the global list.
   (add-hook 'completion-at-point-functions #'cape-dabbrev)
   (add-hook 'completion-at-point-functions #'cape-file)
-  (add-hook 'completion-at-point-functions #'cape-elisp-block))
+  (add-hook 'completion-at-point-functions #'cape-elisp-block)
+  
+  :config
+  (defalias 'a2z/capf-eglot+yas
+    (cape-capf-super
+     (cape-capf-buster #'eglot-completion-at-point)
+     #'yasnippet-capf))
+  
+  (defun a2z/eglot-capf-config ()
+    (setq-local completion-at-point-functions
+	      (list #'cape-file #'a2z/capf-eglot+yas)))
+  
+  (add-hook 'eglot-managed-mode-hook #'a2z/eglot-capf-config))
 
 (use-package dashboard
   :after projectile
