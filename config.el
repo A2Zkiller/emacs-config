@@ -414,6 +414,13 @@
     "w L" '(buf-move-right :wk "Buffer move right"))
   )
 
+(a2z/leader-key
+  "y" '(:ignore t :wk "Snippets")
+  "y i" '(yas-insert-snippet :wk "Insert snippet")
+  "y n" '(yas-new-snippet :wk "New snippet")
+  "y v" '(yas-visit-snippet-file :wk "Visit snippet file")
+  "y r" '(yas-reload-all :wk "Reload snippets"))
+
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
@@ -675,4 +682,14 @@
       which-key-allow-imprecise-window-fit t
       which-key-separator " → " )
 
+(use-package yasnippet
+  :diminish yas-minor-mode
+  :hook (elpaca-after-init . yas-global-mode))
 
+(use-package yasnippet-snippets
+  :after yasnippet)
+
+(use-package yasnippet-capf
+  :after cape
+  :config
+  (add-to-list 'completion-at-point-functions #'yasnippet-capf))

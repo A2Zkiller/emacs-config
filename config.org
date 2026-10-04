@@ -619,6 +619,13 @@
       "w K" '(buf-move-up :wk "Buffer move up")
       "w L" '(buf-move-right :wk "Buffer move right"))
     )
+
+  (a2z/leader-key
+    "y" '(:ignore t :wk "Snippets")
+    "y i" '(yas-insert-snippet :wk "Insert snippet")
+    "y n" '(yas-new-snippet :wk "New snippet")
+    "y v" '(yas-visit-snippet-file :wk "Visit snippet file")
+    "y r" '(yas-reload-all :wk "Reload snippets"))
 #+end_src
 
 
@@ -1052,6 +1059,15 @@ Display the color of hex codes behind them (ex. #ffffff, #000000)
 * YASNIPPET
 
 #+begin_src emacs-lisp
+  (use-package yasnippet
+    :diminish yas-minor-mode
+    :hook (elpaca-after-init . yas-global-mode))
 
-#+end_src
+  (use-package yasnippet-snippets
+    :after yasnippet)
+
+  (use-package yasnippet-capf
+    :after cape
+    :config
+    (add-to-list 'completion-at-point-functions #'yasnippet-capf))
 #+end_src
