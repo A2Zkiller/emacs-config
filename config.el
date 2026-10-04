@@ -188,7 +188,9 @@
 (use-package eglot-booster
   :vc (:url "https://github.com/jdtsmith/eglot-booster")
   :after eglot
-  :config (eglot-booster-mode))
+  :config
+  (setq eglot-booster-io-only t) ;; corfu fix
+  (eglot-booster-mode))
 
   ;; Extra settings to speed up eglot
 (setq gc-cons-threshold 100000000)
