@@ -259,6 +259,7 @@
     (corfu-cycle t)           ;; Enable cycling for `corfu-next/previous'
     (corfu-preselect 'prompt) ;; Always preselect the prompt
     (corfu-preview-current nil) 
+    (corfu-on-exact-match nil)
     
     ;; Use TAB for cycling, default is `corfu-complete'.
     :bind
