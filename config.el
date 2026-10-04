@@ -110,17 +110,37 @@
 
 (setq create-lockfiles nil)
 
-(use-package company
-  :diminish
-  :hook (elpaca-after-init . global-company-mode)
-  :config
-  (setq company-idle-delay 0.0 
-	company-minimum-prefix-length 1))
+(use-package corfu
+  ;; TAB-and-Go customizations
+  :custom
+  (corfu-auto t)
+  (corfu-auto-delay 0.05)
+  (corfu-auto-prefix 2)
+  (corfu-cycle t)           ;; Enable cycling for `corfu-next/previous'
+  (corfu-preselect 'prompt) ;; Always preselect the prompt
+  
+  ;; Use TAB for cycling, default is `corfu-complete'.
+  :bind
+  (:map corfu-map
+	("TAB" . corfu-next)
+	([tab] . corfu-next)
+	("S-TAB" . corfu-previous)
+	([backtab] . corfu-previous))
+  
+  :init
+  (global-corfu-mode))
 
-(use-package company-box
-  :after company
-  :diminish
-  :hook (company-mode . company-box-mode))
+(use-package cape
+  :init
+  (a2z/leader-key
+    "c i" '(cape-prefix-map :wk "Cape completion selection"))
+  ;; Add to the global default value of `completion-at-point-functions' which is
+  ;; used by `completion-at-point'.  The order of the functions matters, the
+  ;; first function returning a result wins.  Note that the list of buffer-local
+  ;; completion functions takes precedence over the global list.
+  (add-hook 'completion-at-point-functions #'cape-dabbrev)
+  (add-hook 'completion-at-point-functions #'cape-file)
+  (add-hook 'completion-at-point-functions #'cape-elisp-block))
 
 (use-package dashboard
   :after projectile
@@ -654,3 +674,5 @@
       which-key-max-description-length 25
       which-key-allow-imprecise-window-fit t
       which-key-separator " → " )
+
+

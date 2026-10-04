@@ -17,6 +17,8 @@
 - [[#buffer-move][BUFFER MOVE]]
 - [[#cleanup][CLEANUP]]
 - [[#company][COMPANY]]
+- [[#corfu][CORFU]]
+  - [[#cape-extensions][Cape Extensions]]
 - [[#dashboard][DASHBOARD]]
 - [[#diminish][DIMINISH]]
 - [[#dired][DIRED]]
@@ -67,6 +69,7 @@
   - [[#magit][Magit]]
   - [[#majutsu][Majutsu]]
 - [[#which-key][WHICH KEY]]
+- [[#yasnippet][YASNIPPET]]
 
 * LOAD FIRST
 
@@ -229,7 +232,7 @@
 
 * COMPANY
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no 
   (use-package company
     :diminish
     :hook (elpaca-after-init . global-company-mode)
@@ -241,6 +244,47 @@
     :after company
     :diminish
     :hook (company-mode . company-box-mode))
+#+end_src
+
+
+* CORFU
+
+#+begin_src emacs-lisp
+  (use-package corfu
+    ;; TAB-and-Go customizations
+    :custom
+    (corfu-auto t)
+    (corfu-auto-delay 0.05)
+    (corfu-auto-prefix 2)
+    (corfu-cycle t)           ;; Enable cycling for `corfu-next/previous'
+    (corfu-preselect 'prompt) ;; Always preselect the prompt
+    
+    ;; Use TAB for cycling, default is `corfu-complete'.
+    :bind
+    (:map corfu-map
+  	("TAB" . corfu-next)
+  	([tab] . corfu-next)
+  	("S-TAB" . corfu-previous)
+  	([backtab] . corfu-previous))
+    
+    :init
+    (global-corfu-mode))
+#+end_src
+
+** Cape Extensions
+
+#+begin_src emacs-lisp
+  (use-package cape
+    :init
+    (a2z/leader-key
+      "c i" '(cape-prefix-map :wk "Cape completion selection"))
+    ;; Add to the global default value of `completion-at-point-functions' which is
+    ;; used by `completion-at-point'.  The order of the functions matters, the
+    ;; first function returning a result wins.  Note that the list of buffer-local
+    ;; completion functions takes precedence over the global list.
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block))
 #+end_src
 
 
@@ -1002,4 +1046,12 @@ Display the color of hex codes behind them (ex. #ffffff, #000000)
         which-key-max-description-length 25
         which-key-allow-imprecise-window-fit t
         which-key-separator " → " )
+#+end_src
+
+
+* YASNIPPET
+
+#+begin_src emacs-lisp
+
+#+end_src
 #+end_src
