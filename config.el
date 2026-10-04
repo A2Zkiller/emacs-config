@@ -134,8 +134,6 @@
 
 (use-package cape
   :init
-  (a2z/leader-key
-    "c i" '(cape-prefix-map :wk "Cape completion selection"))
   ;; Add to the global default value of `completion-at-point-functions' which is
   ;; used by `completion-at-point'.  The order of the functions matters, the
   ;; first function returning a result wins.  Note that the list of buffer-local
@@ -145,6 +143,7 @@
   (add-hook 'completion-at-point-functions #'cape-elisp-block)
   
   :config
+
   (defalias 'a2z/capf-eglot+yas
     (cape-capf-super
      (cape-capf-buster #'eglot-completion-at-point)
@@ -326,7 +325,8 @@
     "c a" '(eglot-code-actions :wk "Code Actions")
     "c d" '(eldoc :wk "Eldoc")
     "c n" '(flymake-goto-next-error :wk "Goto next error")
-    "c p" '(flymake-goto-prev-error :wk "Goto prev error"))
+    "c p" '(flymake-goto-prev-error :wk "Goto prev error")
+    "c i" '(cape-prefix-map :wk "Cape completion selection"))
   
   (a2z/leader-key
     "d" '(:ignore t :wk "Dired")
@@ -428,14 +428,13 @@
     "w J" '(buf-move-down :wk "Buffer move down")
     "w K" '(buf-move-up :wk "Buffer move up")
     "w L" '(buf-move-right :wk "Buffer move right"))
-  )
 
-(a2z/leader-key
-  "y" '(:ignore t :wk "Snippets")
-  "y i" '(yas-insert-snippet :wk "Insert snippet")
-  "y n" '(yas-new-snippet :wk "New snippet")
-  "y v" '(yas-visit-snippet-file :wk "Visit snippet file")
-  "y r" '(yas-reload-all :wk "Reload snippets"))
+  (a2z/leader-key
+    "y" '(:ignore t :wk "Snippets")
+    "y i" '(yas-insert-snippet :wk "Insert snippet")
+    "y n" '(yas-new-snippet :wk "New snippet")
+    "y v" '(yas-visit-snippet-file :wk "Visit snippet file")
+    "y r" '(yas-reload-all :wk "Reload snippets")))
 
 (menu-bar-mode -1)
 (tool-bar-mode -1)
