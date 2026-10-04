@@ -298,6 +298,7 @@
       (setq-local completion-at-point-functions
   	      (list #'cape-file #'a2z/capf-eglot+yas)))
     
+    (setq text-mode-ispell-word-completion nil)   
     (add-hook 'eglot-managed-mode-hook #'a2z/eglot-capf-config))
 #+end_src
 
