@@ -47,6 +47,7 @@
   - [[#config-files][Config Files]]
   - [[#nix][Nix]]
   - [[#odin][Odin]]
+  - [[#perl][Perl]]
   - [[#python][Python]]
   - [[#rust][Rust]]
   - [[#slang][Slang]]
@@ -830,6 +831,23 @@ Set treesitter lock mode for max detail when selecting colors
     (add-to-list 'eglot-server-programs '((odin-mode odin-ts-mode) . ("ols"))))
 
   (add-hook 'odin-ts-mode-hook #'eglot-ensure)
+#+end_src
+
+
+** Perl
+
+#+begin_src emacs-lisp
+  (use-package cperl-mode
+    :ensure nil
+    :mode ("\\.\\(pl\\|pm\\|t\\)\\'" . cperl-mode)
+    :interpreter ("perl" . cperl-mode)
+    :hook (cperl-mode . eglot-ensure))
+
+  (with-eval-after-load 'eglot
+    (add-to-list 'eglot-server-programs
+  	       '((cperl-mode perl-mode) . ("perlnavigator" "--stdio"))))
+  
+  (add-to-list 'trusted-content "~/Projects/Perl/")
 #+end_src
 
 

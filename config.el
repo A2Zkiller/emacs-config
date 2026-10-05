@@ -514,7 +514,8 @@
 (use-package nix-ts-mode
   :mode "\\.nix\\'")
 
-(a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))))
+(a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))
+					 :nil (:nix (:flake (:autoArchive t)))))
 
 (add-hook 'nix-ts-mode-hook #'eglot-ensure)
 
@@ -556,6 +557,18 @@
   (add-to-list 'eglot-server-programs '((odin-mode odin-ts-mode) . ("ols"))))
 
 (add-hook 'odin-ts-mode-hook #'eglot-ensure)
+
+(use-package cperl-mode
+  :ensure nil
+  :mode ("\\.\\(pl\\|pm\\|t\\)\\'" . cperl-mode)
+  :interpreter ("perl" . cperl-mode)
+  :hook (cperl-mode . eglot-ensure))
+
+(with-eval-after-load 'eglot
+  (add-to-list 'eglot-server-programs
+	       '((cperl-mode perl-mode) . ("perlnavigator" "--stdio"))))
+
+(add-to-list 'trusted-content "~/Projects/Perl/")
 
 (use-package python
   :ensure nil
