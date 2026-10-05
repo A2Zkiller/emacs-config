@@ -775,7 +775,8 @@ Set treesitter lock mode for max detail when selecting colors
   (use-package nix-ts-mode
     :mode "\\.nix\\'")
 
-  (a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))))
+  (a2z/lsp-config-add 'nix-ts-mode '(:nixd (:formatting (:command ["alejandra"]))
+  					 :nil (:nix (:flake (:autoArchive t)))))
 
   (add-hook 'nix-ts-mode-hook #'eglot-ensure)
 
